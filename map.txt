@@ -1,0 +1,76 @@
+ /* APPLICATION MAP :
+ /****************************************************
+Portfolio = {
+		init : 					function(mode,callback) {},
+		UI: 					{},		
+		CONFIG : 				{},
+		GLOBAL : 				{}
+	
+		getdata = {
+			init: 				function(callback) {},
+			albums : 			function() {},		
+			galleries : 		function(callback) {},
+			pictures : 			function(gid) {}
+			
+		navigation = {
+			init : 				function(mode) {},
+			home : 				function() {},
+			album : {			
+				create : 		function(getAlbums) {},
+				show : 			function() {},
+				activate : 		function(slug) {},
+				launch : 		function(albumSlug) {}
+			},
+			gallery : {
+				create : 		function(callback) {},
+				launch : 		function(slug) {},
+				getActive : 	function() {},
+				getRecent : 	function() {},
+				setActive : 	function(slug) {}
+			}	
+			
+		template = {
+			init : 				function() {},
+			resize : {
+				init : 			function() {},
+				albums: 		function() {},
+				scrollTop: 		function(mode) {},
+				scrollBottom: 	function(mode) {}
+			},		
+			gallery : {
+				initTogglers : 	function() {},
+				show : 			function() {},
+				hide : 			function() {},
+				posterMode : 	function() {},
+				tileMode : 		function() {},
+				blogMode : 		function() {}
+			},
+			project : {
+				init : 			function() {},
+				create : 		function(pictures,slug) {},
+				open : 			function() {},
+				close : 		function() {}
+			},		
+			closepopin : 		function() {},
+			showreel : {
+				init : 			function() {},
+				create : 		function() {},
+				open : 			function() {},
+				center : 		function() {},
+				close : 		function() {}
+			},
+			about : 			{},
+			blackScreen : {			
+				init : 			function() {},
+				show : 			function() {},
+				hide : 			function() {}
+			}
+		
+		route = {
+			init: 				function(){},
+			setChangeEvent: 	function(){},
+			pushThis : 			function(pushIt) {},
+			pushUrl: 			function() {},
+			go: 				function() {}			
+
+****************************************************/

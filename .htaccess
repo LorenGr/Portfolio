@@ -1,0 +1,17 @@
+RewriteBase /
+RewriteEngine On    # Turn on the rewriting engine
+RewriteRule    ^web-design/b3w/?$    index.html    [NC,L]
+RewriteRule    ^web-design/zheta-international/?$    index.html    [NC,L]
+RewriteRule    ^web-design/pippa-toledo/?$    index.html    [NC,L]
+RewriteRule    ^web-design/pippa-toledo-shop/?$    index.html    [NC,L]
+RewriteRule    ^web-design/satariano/?$    index.html    [NC,L]
+RewriteRule    ^web-design/portomaso-casino/?$    index.html    [NC,L]
+RewriteRule    ^web-design/hotel-valentina/?$    index.html    [NC,L]
+RewriteRule    ^web-design/toni-guy/?$    index.html    [NC,L]
+RewriteRule    ^web-design/tumas-developments/?$    index.html    [NC,L]
+RewriteRule    ^web-design/romain-negre/?$    index.html    [NC,L]
+RewriteRule    ^web-design/oliver-mcgettigan/?$    index.html    [NC,L]
+RewriteRule    ^web-design/e-play24/?$    index.html    [NC,L]
+RewriteRule    ^web-design/blue-creek-restaurant/?$    index.html    [NC,L]
+RewriteRule    ^showreel/?$    index.html    [NC,L]
+RewriteRule    ^about/?$    index.html    [NC,L]
