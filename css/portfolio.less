@@ -120,7 +120,7 @@ html { -webkit-font-smoothing: antialiased; }
 					
  /************  Z-INDEXES **************/
 .goTop							{ z-index: 620; }
-#showreelContainer, #about		{ z-index: 600; }
+#showreel, #about				{ z-index: 600; }
 #galleries-container .left , 
 #galleries-container .right,
 #galleries-container #layouts 	{ z-index: 550; }
@@ -524,6 +524,7 @@ aside {
 	max-width: 960px;
 	margin: 30px auto 0 auto; 
 	#project {
+		display: none;
 		position: relative;
 		.header {
 			.closer {
@@ -632,9 +633,86 @@ aside {
 	}
 }
 #super-container>#about {
+
+	.closer {
+		.closerButton;
+		margin-top: 0px;	
+		position: absolute;
+		right: 0;
+		top : 0;
+	}
+
 	display: none;
-	width: 300px;
-	height: 300px;	
+	width: 800px;
+	height: 600px;	
+	position: fixed;
+	white-space: nowrap;
+	font-size: 0;
+	overflow: hidden;
+	.photo {
+		width: 200px;
+		display: inline-block;
+		-moz-box-sizing:border-box;	
+		box-sizing:border-box;	
+		height: 600px;
+		vertical-align: top;
+		background-image: url("../img/loren.png");
+		background-repeat: no-repeat;
+	}
+	.profile {
+		vertical-align: top;
+		display: inline-block;
+		width: 600px;
+		-moz-box-sizing:border-box;	
+		box-sizing:border-box;	
+
+		height: 600px;
+		p {
+			border-bottom: 1px dashed #bec3c7;
+			width: 600px;
+			height: 500px;
+			.paragraphText;	
+			span {
+				line-height: 30px;
+				white-space: normal;
+				display: block;
+				margin: 0 93px;
+				em {
+					font-family: 'Custom-Reg';
+					font-size: 32px;
+					display: block;
+					padding: 44px 0;		
+				}
+			}
+		}
+		a {
+			width: 300px;
+			height: 100px;
+			display: inline-block;
+			-moz-box-sizing:border-box;	
+			box-sizing:border-box;
+			text-align: center;
+			line-height: 100px;
+			font-size: 18px;
+			text-decoration: none;	
+			color: #6c6c6c;
+			font-family: 'Custom-Reg';
+			span {
+				width: 115px;
+				height:44px;
+				background-image: @sprite;
+				background-repeat: no-repeat;
+				display: inline-block;
+				margin: 25px auto 0 auto;
+			}
+			&#behance span {
+				background-position: 0 -337px;
+			}
+			&#linkedin span {
+				background-position: 0 -388px;
+			}
+		}
+	}
 }
 
 .panel {

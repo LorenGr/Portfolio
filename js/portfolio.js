@@ -4,10 +4,10 @@
  ************************************************************/
 
 /*** TODO *************************
-> add ABOUT page
-	> add links to linkedin and behance
 > gallery view navigation (left-right)
 > second layout mode (tileMode)
+> add frontend projects
+> add responsive
 
 /* APPLICATION MAP :
 /****************************************************
@@ -109,8 +109,8 @@ $(document).ready( function() {
 			"galleries"			: $("#galleries-container #galleries"),
 			"projectContainer"	: $("#project-container"),
 			"project"			: $("#project-container #project"),
-			"showreel"			: $("#showreel"),
-			"about"				: $("#about")	
+			"showreel"			: $("#super-container>#showreel"),
+			"about"				: $("#super-container>#about")	
 		},		
 		//Create arrays for albums galleries and pictures
 		DATASOURCES : {
@@ -140,7 +140,8 @@ $(document).ready( function() {
 			"gallery_mode" 			: "blogMode", //default mode on init
 			"open_popin"			: "", //store name of which popen is open currently
 			"showreel_url" 			: "http://www.youtube.com/embed/zh8xD8BE2YA?autoplay=1&hd=1",
-			"video_size"			: 0.7 //YouTube player, values is % width/height of screen
+			"video_size"			: 0.7, //YouTube player, values is % width/height of screen
+			"player"				: ""
 		},
 		GLOBAL : {
 			"History" 		: window.History
@@ -240,13 +241,15 @@ $(document).ready( function() {
 						$(".goTop").addClass("enable");					
 					}
 				});	
-				$(".links #about").click( function() {
+				$(".links #about").click( function(e) {
+					e.preventDefault();
 					Portfolio.route.pushThis("about");
 				});
 				$(".goTop").click(function() {
 					Portfolio.template.resize.scrollTop();
 				});
 				//Launch galleries using default filtering
+				Portfolio.template.about.init();
 				Portfolio.navigation.album.launch();
 			},
 			home : function() {
@@ -534,7 +537,10 @@ $(document).ready( function() {
 				open : function() {
 					$("html,body").stop();
 					//call openpopin
+					
 					Portfolio.UI.projectContainer.show();
+					Portfolio.UI.project.slide("in","right");
+
 					Portfolio.template.gallery.hide();
 					Portfolio.template.blackScreen.show();
 					Portfolio.template.resize.scrollTop("static");				
@@ -543,6 +549,7 @@ $(document).ready( function() {
 				close : function() {
 					//call closepopin
 					Portfolio.UI.projectContainer.hide();
+					Portfolio.UI.project.slide("out","left");
 					Portfolio.template.blackScreen.hide();
 					Portfolio.template.gallery.show();
 					
@@ -561,7 +568,31 @@ $(document).ready( function() {
 				init : function() {
 					Portfolio.UI.showreel.find(".closer").click(function(){
 						Portfolio.navigation.home();		
-					});				
+					});							
+					//Load video through youtube api
+					var tag = document.createElement('script');
+			        tag.src = "https://www.youtube.com/iframe_api";
+			        var firstScriptTag = document.getElementsByTagName('script')[0];
+			        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+				},
+				loaded : function() {					
+					Portfolio.CONFIG.player = new YT.Player('showreel-player', {
+			          height: '390',
+			          width: '640',
+			          videoId: 'zh8xD8BE2YA?',
+			          events: {
+			            'onReady': Portfolio.template.showreel.ready			            
+			          }
+			        });			        
+				},
+				ready : function(event) {
+        			//Video is now ready to be used
+				},
+				pause : function(event) {
+        			Portfolio.CONFIG.player.stopVideo();
+				},
+				play : function(event) {
+        			Portfolio.CONFIG.player.playVideo();
 				},
 				create : function() {
 					Portfolio.template.showreel.open();	
@@ -569,7 +600,7 @@ $(document).ready( function() {
 				open : function() {
 					Portfolio.UI.showreel.show();
 					Portfolio.template.showreel.center();	
-					$('#yt-showreel').attr("src",Portfolio.CONFIG.showreel_url);
+					Portfolio.template.showreel.play();
 					Portfolio.template.blackScreen.show();
 					Portfolio.CONFIG.open_popin = "showreel";
 				},
@@ -583,7 +614,7 @@ $(document).ready( function() {
 				close : function() {
 					Portfolio.UI.showreel.hide();
 					Portfolio.template.blackScreen.hide();
-					$('#yt-showreel').attr("src","");	
+					Portfolio.template.showreel.pause();
 					Portfolio.CONFIG.open_popin = "";			
 				}
 			},
@@ -594,8 +625,10 @@ $(document).ready( function() {
 					});	
 				},
 				open : function() {
+					console.log("opening about");
 					Portfolio.UI.about.show();
-					//Portfolio.template.about.center(); //todo : create a centering plugin
+					Portfolio.UI.about.show();
+					Portfolio.UI.about.centerThis();
 					Portfolio.template.blackScreen.show();
 					Portfolio.CONFIG.open_popin = "about";
 				},
@@ -625,7 +658,6 @@ $(document).ready( function() {
 		route : {
 			init: function(){
 				Portfolio.route.setChangeEvent();				
-				console.log("url set to :"+Portfolio.CONFIG.site_domain);
 			},
 			setChangeEvent: function(){
 				Portfolio.GLOBAL.History.Adapter.bind(window,'statechange',function(){
@@ -707,5 +739,65 @@ $(document).ready( function() {
  	} else { 	 		
  		Portfolio.route.go(); 		
  	}
+
+ 	//EXTEND FUNCTIONS
+ 	$.fn.centerThis = function () { //this centers objects in the center of the screen	
+		this.css("top",  ( $(window).height() - this.height() ) / 2 );
+	    this.css("left", ( $(window).width()  - this.width()  ) / 2 );
+	    return this;	   
+ 	}; 	
+ 	$.fn.slide = function(state,from) { //this slides in elements from any corner of the screen
+ 		
+ 		var calcLeft = this.width()+(($(window).width()-this.width())/2),
+ 			calcTop  = this.height()+(($(window).height()-this.height())/2),
+ 			getFrom  = from || "left",
+ 			getState  = state || "in";
+
+ 			console.log("sending panel to: state: " + getState + " and from: " + getFrom);
+
+ 		if(getState == "in") {	 	
+	 		if(getFrom == "left" || getFrom == "right") {			
+	 			if(getFrom=="left") {
+	 				calcLeft = -calcLeft;
+	 			}
+		 		this.css("left",calcLeft).show().animate({
+		 			left : 0
+		 		},800);
+	 		}
+	 		if(getFrom == "top" || getFrom == "bottom") {			
+	 			if(getFrom=="top") {
+	 				calcTop = -calcTop;
+	 			}
+		 		this.css("top",calcTop).show().animate({
+		 			top : 0
+		 		},800);
+	 		}
+ 		} else {
+ 			if(getFrom == "left" || getFrom == "right") {			
+	 			if(getFrom=="right") {
+	 				calcLeft = -calcLeft;
+	 			}
+		 		this.css("left",0).animate({
+		 			left : calcLeft
+		 		},800,function() {
+		 			//$(this).hide();
+		 		});
+	 		}
+	 		if(getFrom == "top" || getFrom == "bottom") {			
+	 			if(getFrom=="bottom") {
+	 				calcTop = -calcTop;
+	 			}
+		 		this.css("top",0).animate({
+		 			top : calcTop
+		 		},800,function() {
+		 			//$(this).hide();
+		 		});
+	 		}
+ 		}
+ 	};
+
 });
 
+function onYouTubeIframeAPIReady() {
+	Portfolio.template.showreel.loaded();	
+}
