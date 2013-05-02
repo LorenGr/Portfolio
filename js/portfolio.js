@@ -58,6 +58,10 @@ Portfolio = {
 			closepopin : 		function() {},
 			showreel : {
 				init : 			function() {},
+				loaded : 		function() {},
+				ready : 		function(event) {},
+				pause : 		function(event) {},
+				play : 			function(event) {},
 				create : 		function() {},
 				open : 			function() {},
 				center : 		function() {},
@@ -75,7 +79,11 @@ Portfolio = {
 			setChangeEvent: 	function(){},
 			pushThis : 			function(pushIt) {},
 			pushUrl: 			function() {},
-			go: 				function() {}			
+			go: 				function() {}		
+
+*********** Extend functions ************************
+			centerThis		: function()	
+			slide 			: function(state,from)
 ****************************************************/
 
 $(document).ready( function() {
@@ -141,7 +149,8 @@ $(document).ready( function() {
 			"open_popin"			: "", //store name of which popen is open currently
 			"showreel_url" 			: "http://www.youtube.com/embed/zh8xD8BE2YA?autoplay=1&hd=1",
 			"video_size"			: 0.7, //YouTube player, values is % width/height of screen
-			"player"				: ""
+			"player"				: "",
+			"playerLoaded"			: false
 		},
 		GLOBAL : {
 			"History" 		: window.History
@@ -152,8 +161,7 @@ $(document).ready( function() {
 				    type: 'GET',
 				    url: Portfolio.CONFIG.json_path,
 				    dataType: 'json',
-				    success: function(jsonData) {	
-
+				    success: function(jsonData) {
 				        //Populate arrays from the JSON nodes
 				        Portfolio.DATASOURCES.albums = jsonData.albums;
 				    	Portfolio.DATASOURCES.galleries = jsonData.galleries;
@@ -277,23 +285,21 @@ $(document).ready( function() {
 						//Create Menu Items
 						$nav_el = '';
 						$nav_el = "<a class='album-links "+addClass+"' href='#' data-slug="+getSlug+" id="+getID+"><span>"+getName+"</span></a>";				
-						$html += $nav_el;										
+						$html += $nav_el;
 					});
 					Portfolio.UI.nav.append($html);
 					//over click test passed
-					Portfolio.UI.nav.find(".album-links").click( function(e){				
+					Portfolio.UI.nav.find(".album-links").click( function(e){
 						e.preventDefault();
-						Portfolio.CONFIG.active_album 		= $(this).attr("id");	
-						Portfolio.CONFIG.active_album_slug 	= $(this).data("slug");
-						Portfolio.CONFIG.active_album_title = $(this).text();
-						Portfolio.navigation.album.launch($(this).data("slug"));			
-					});				
+						var setSlug = $(this).data("slug");
+						Portfolio.navigation.album.setActive(setSlug);
+						Portfolio.navigation.album.launch(setSlug);
+					});
 				},
 				show : function() {
 					Portfolio.UI.nav.addClass("enabled");
 				},
-				activate : function(slug) {				
-					
+				activate : function(slug) {	//visual activation
 					if(slug.charAt(0)==".") slug=slug.substring(1); 
 					console.log("activating: "+slug);
 					var clickedAlbum = Portfolio.UI.nav.find(".album-links[data-slug='"+slug+"']"),
@@ -301,6 +307,12 @@ $(document).ready( function() {
 					albums.removeClass("active");
 					clickedAlbum.addClass("active");
 					Portfolio.CONFIG.album_filters = "."+slug;
+				},
+				setActive : function(slug)  {
+					var $getObj = Portfolio.UI.nav.find(".album-links[data-slug='"+slug+"']");
+					Portfolio.CONFIG.active_album 		= $getObj.attr("id");
+					Portfolio.CONFIG.active_album_slug 	= $getObj.data("slug");
+					Portfolio.CONFIG.active_album_title = $getObj.text();
 				},
 				launch : function(albumSlug) {
 					if(albumSlug=="showreel") {
@@ -583,7 +595,8 @@ $(document).ready( function() {
 			          events: {
 			            'onReady': Portfolio.template.showreel.ready			            
 			          }
-			        });			        
+			        });	
+			        Portfolio.CONFIG.playerLoaded = true;		        
 				},
 				ready : function(event) {
         			//Video is now ready to be used
@@ -592,7 +605,9 @@ $(document).ready( function() {
         			Portfolio.CONFIG.player.stopVideo();
 				},
 				play : function(event) {
-        			Portfolio.CONFIG.player.playVideo();
+        			if(Portfolio.CONFIG.playerLoaded)  {
+        				Portfolio.CONFIG.player.playVideo();
+        			}
 				},
 				create : function() {
 					Portfolio.template.showreel.open();	
@@ -719,11 +734,13 @@ $(document).ready( function() {
 				    	if(Portfolio.CONFIG.first_time) { //If accessing a project directly through url
 							//if page requested is a gallery				
 							Portfolio.init("direct",function() {
+								Portfolio.navigation.album.setActive(slugs[0]);	
 								Portfolio.navigation.gallery.setActive(slugs[1]);	
 								Portfolio.navigation.gallery.launch(slugs[1]); //Launch project		
 							});
 							
 						} else {				
+							Portfolio.navigation.album.setActive(slugs[0]);	
 							Portfolio.navigation.gallery.setActive(slugs[1]);
 							Portfolio.navigation.gallery.launch(slugs[1]); //Launch project	
 						}
