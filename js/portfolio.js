@@ -3,11 +3,6 @@
   ******************* Author : Loren Grixti  ****************
  ************************************************************/
 
-/*** TODO *************************
-> gallery view navigation (left-right)
-> second layout mode (tileMode)
-> add frontend projects
-> add responsive
 
 /* APPLICATION MAP :
 /****************************************************
