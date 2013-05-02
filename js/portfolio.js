@@ -544,23 +544,28 @@ $(document).ready( function() {
                     $("html,body").stop();
                     //call openpopin
                     
-                    Portfolio.UI.projectContainer.show();
-                    Portfolio.UI.project.slide("in","right");
+                    if(Portfolio.CONFIG.open_popin == "")  {
+                        Portfolio.UI.projectContainer.slide("in","right");
+                    } else  {
+                        Portfolio.UI.projectContainer.show();
+                        Portfolio.UI.project.show();
+                    }
+                    Portfolio.UI.galleries.css("height",$(window).width()-Portfolio.UI.header.height());
 
-                    Portfolio.template.gallery.hide();
+
                     Portfolio.template.blackScreen.show();
                     Portfolio.template.resize.scrollTop("static");              
                     Portfolio.CONFIG.open_popin = "project";                
                 },
                 close : function() {
-                    //call closepopin
-                    Portfolio.UI.projectContainer.hide();
-                    Portfolio.UI.project.slide("out","left");
-                    Portfolio.template.blackScreen.hide();
-                    Portfolio.template.gallery.show();
+                    //call closepopin                    
+                    Portfolio.UI.projectContainer.slide("out","left", function()  {
+                        Portfolio.template.blackScreen.hide();
+                        var obj = Portfolio.navigation.gallery.getRecent();
+                        if(obj!="") Portfolio.template.resize.scrollTop(obj.offset().top-obj.height()/2);                                           
+                    });
                     
-                    var obj = Portfolio.navigation.gallery.getRecent();
-                    if(obj!="") Portfolio.template.resize.scrollTop(obj.offset().top-obj.height()/2);                               
+                   Portfolio.UI.galleries.css("height","auto");
                 }
             },      
             closepopin : function() {           
@@ -757,51 +762,63 @@ $(document).ready( function() {
             this.css("left", ( $(window).width()  - this.width()  ) / 2 );
             return this;       
     };  
-    $.fn.slide = function(state,from) { //this slides in elements from any corner of the screen
+    $.fn.slide = function(state,from,callback) { //this slides in elements from any corner of the screen
         
         var calcLeft = this.width()+(($(window).width()-this.width())/2),
             calcTop  = this.height()+(($(window).height()-this.height())/2),
             getFrom  = from || "left",
-            getState  = state || "in";
-
-            console.log("sending panel to: state: " + getState + " and from: " + getFrom);
+            getState  = state || "in",
+            obj = this,
+            thisChild = this.first();
 
         if(getState == "in") {      
+            
+            obj.show();
+
             if(getFrom == "left" || getFrom == "right") {           
                 if(getFrom=="left") {
                     calcLeft = -calcLeft;
                 }
-                this.css("left",calcLeft).show().animate({
+                obj.children(":first").css("left",calcLeft).show().animate({
                     left : 0
-                },800);
+                },800,"easeInOutCirc");
             }
             if(getFrom == "top" || getFrom == "bottom") {           
                 if(getFrom=="top") {
                     calcTop = -calcTop;
                 }
-                this.css("top",calcTop).show().animate({
+                obj.children(":first").css("top",calcTop).show().animate({
                     top : 0
-                },800);
+                },800,"easeInOutCirc");
             }
         } else {
             if(getFrom == "left" || getFrom == "right") {           
-                if(getFrom=="right") {
+                if(getFrom=="left") {
                     calcLeft = -calcLeft;
                 }
-                this.css("left",0).animate({
+                obj.children(":first").css("left",0).animate({
                     left : calcLeft
-                },800,function() {
-                    //$(this).hide();
+                },500,"easeInOutQuad",function() {
+                    obj.hide();
+
+                    if(typeof callback == 'function'){
+                        callback.call(this);
+                    }
                 });
             }
             if(getFrom == "top" || getFrom == "bottom") {           
+                
                 if(getFrom=="bottom") {
                     calcTop = -calcTop;
                 }
-                this.css("top",0).animate({
+                obj.children(":first").css("top",0).animate({
                     top : calcTop
-                },800,function() {
-                    //$(this).hide();
+                },500,"easeInOutQuad",function() {
+                    obj.hide();
+
+                    if(typeof callback == 'function'){
+                        callback.call(this);
+                    }
                 });
             }
         }
