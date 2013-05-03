@@ -110,7 +110,8 @@ $(document).ready( function() {
             "galleriesContainer"    : $("#galleries-container"),
             "galleries"             : $("#galleries-container #galleries"),
             "projectContainer"      : $("#project-container"),
-            "project"               : $("#project-container #project"),
+            "projects"              : $("#project-container #projects"),
+            "projectTemplate"       : $(".project#template"),
             "showreel"              : $("#super-container>#showreel"),
             "about"                 : $("#super-container>#about")  
         },      
@@ -137,6 +138,7 @@ $(document).ready( function() {
             "gallery_images_path"   : "gallery/", //folder name where to find images 
             "active_album_title"    : "",
             "active_gallery_title"  : "",           
+            "active_gallery_slug"   : "",           
             "album_filters"         : ".web-design", //first type of projects to show by default
             "resize_timer"          : 0,
             "gallery_mode"          : "blogMode", //default mode on init
@@ -170,11 +172,11 @@ $(document).ready( function() {
                     }
                 });         
             },
-            albums : function() {
+            albums : function() {  //getdata
                 $albums = Portfolio.DATASOURCES.albums;
                 Portfolio.navigation.album.create($albums);             
             },      
-            galleries : function(callback) {
+            galleries : function(callback) {  //getdata
                 $galleries = Portfolio.DATASOURCES.galleries;
                 $gallery   = $galleries.Galleries;  
                 
@@ -209,7 +211,7 @@ $(document).ready( function() {
                     }
                 });
             },
-            pictures : function(gid) {
+            pictures : function(gid) {  //getdata
                 console.log("getting pictures data:"+gid);
                 $pictures = Portfolio.DATASOURCES.pictures;
                 $picture  = $pictures.Pictures;
@@ -254,12 +256,12 @@ $(document).ready( function() {
                 Portfolio.template.about.init();
                 Portfolio.navigation.album.launch();
             },
-            home : function() {
+            home : function() { //navigation
                 Portfolio.CONFIG.recent_gallery = Portfolio.CONFIG.active_gallery;
                 Portfolio.CONFIG.active_gallery = "";
                 Portfolio.route.pushUrl();  
             },
-            album : {           
+            album : { //navigation
                 create : function(getAlbums) {
                     var getName,getID,getSlug,getFilter,addClass,$html = "",
                         $albums = getAlbums,
@@ -320,7 +322,15 @@ $(document).ready( function() {
                     }
                 }
             },
-            gallery : {
+            gallery : { //navigation
+            	initTogglers : function() {
+                    Portfolio.UI.galleriesContainer.find("#layouts a").click(function() {
+                        $newGalleryMode = $(this).attr("id");
+                        Portfolio.UI.galleriesContainer.removeClass(Portfolio.CONFIG.gallery_mode).addClass($newGalleryMode);
+                        Portfolio.CONFIG.gallery_mode = $newGalleryMode;
+                        Portfolio.template.gallery[$newGalleryMode]();
+                    });
+                },
                 create : function(callback) {
                     var $html      = "",    
                         $gallery   = Portfolio.DATASOURCES.allGalleries,
@@ -360,7 +370,6 @@ $(document).ready( function() {
 
                         });
                     }
-                    //over click test passed
                     $container.find(".gallery-holder").click( function() {  
                         Portfolio.CONFIG.active_album_title      = $(this).data("album");   
                         Portfolio.navigation.gallery.setActive($(this).data("slug"));                   
@@ -369,8 +378,8 @@ $(document).ready( function() {
                     $galleriesContainer.addClass($galleryMode);
                                     
                     //Call gallery layout mode template
-                    Portfolio.template.gallery.initTogglers();
-                    Portfolio.template.gallery[$galleryMode]();
+                    //Portfolio.navigation.gallery.initTogglers();
+                    //Portfolio.template.gallery[$galleryMode]();
 
                     if(typeof callback == 'function'){
                         callback.call(this);
@@ -378,10 +387,9 @@ $(document).ready( function() {
                 },
                 launch : function(slug) {
                     if(slug != "2012") {
-                        
-                        //TODO galleries are empty at this stage for gallery directeded launches
                         getPictures = Portfolio.getdata.pictures(Portfolio.UI.galleries.find(".gallery-holder[data-slug='"+slug+"']").attr("id"));
                         Portfolio.template.project.create(getPictures,slug);
+                        console.log("launching project");
                         Portfolio.template.project.open();                  
                     } else {
                         Portfolio.template.showreel.create();
@@ -405,9 +413,36 @@ $(document).ready( function() {
                     }
                 },
                 setActive : function(slug) {            
+                    console.log("setActive fn b4 : recent_gallery : " + Portfolio.CONFIG.recent_gallery + " /   active_gallery  : "+Portfolio.CONFIG.active_gallery);
+                    Portfolio.CONFIG.recent_gallery 	  = Portfolio.CONFIG.active_gallery;
+                    Portfolio.CONFIG.active_gallery_slug = slug;
                     Portfolio.CONFIG.active_gallery_title = Portfolio.UI.galleries.find(".gallery-holder[data-slug='"+slug+"'] h2").text(); 
                     Portfolio.CONFIG.active_gallery       = Portfolio.UI.galleries.find(".gallery-holder[data-slug='"+slug+"']").attr("id");
+                    console.log("setActive fn : recent_gallery : " + Portfolio.CONFIG.recent_gallery + " /   active_gallery  : "+Portfolio.CONFIG.active_gallery);
                 }
+            },
+            project : { //navigation
+            	init : function() {
+            		Portfolio.UI.projectTemplate.find(".side a").click(function(e) {                        
+                        console.log("clicked side");
+                        e.preventDefault();
+                        Portfolio.CONFIG.active_album_title = $(this).data("album");    
+                        Portfolio.navigation.gallery.setActive($(this).data("slug"));
+                        Portfolio.route.pushUrl();                      
+                    });
+
+                    Portfolio.UI.projectTemplate.find(".closer").click(function() {
+                        Portfolio.navigation.home();                    
+                    }); 
+
+                    Portfolio.UI.projectContainer.find(".right.nav").click(function() {
+                    	Portfolio.UI.projects.children(":first").find(".side a.active").next().trigger("click");	
+                    }); 
+                    Portfolio.UI.projectContainer.find(".left.nav").click(function() {
+                    	Portfolio.UI.projects.children(":first").find(".side a.active").prev().trigger("click");	
+                    });   
+                    //Todo : change animation direction of going to previous project       
+            	}	
             }   
         },  
         template : {
@@ -418,7 +453,7 @@ $(document).ready( function() {
                 });
                 Portfolio.template.project.init();
             },
-            resize : {
+            resize : { //template
                 init : function() {
                     Portfolio.template.resize.albums();
                 },
@@ -426,6 +461,7 @@ $(document).ready( function() {
                     Portfolio.UI.nav.css("margin-top",Portfolio.UI.navContainer.height()/2-Portfolio.UI.nav.height()/2);
                 },
                 scrollTop: function(mode) {             
+                    console.log("resize function");
                     if($.isNumeric(mode)) {
                         $('body,html').scrollTop(mode); 
                     } else {
@@ -449,16 +485,7 @@ $(document).ready( function() {
                     }                           
                 }
             },      
-            gallery : {
-                initTogglers : function() {
-
-                    Portfolio.UI.galleriesContainer.find("#layouts a").click(function() {
-                        $newGalleryMode = $(this).attr("id");
-                        Portfolio.UI.galleriesContainer.removeClass(Portfolio.CONFIG.gallery_mode).addClass($newGalleryMode);
-                        Portfolio.CONFIG.gallery_mode = $newGalleryMode;
-                        Portfolio.template.gallery[$newGalleryMode]();
-                    });
-                },
+            gallery : { //template                
                 show : function() {
                     Portfolio.UI.galleries.show();
                 },
@@ -475,7 +502,7 @@ $(document).ready( function() {
 
                 }
             },
-            project : {
+            project : {  //template
                 init : function() {
                     $galleries = Portfolio.DATASOURCES.galleries;
                     $gallery   = $galleries.Galleries;
@@ -484,35 +511,29 @@ $(document).ready( function() {
                         getName  = $gallery[i].title;
                         getAlbum = $gallery[i].album;
                         getID    = $gallery[i].gid; 
-                        Portfolio.UI.project.find(".side").append("<a href='#' id='"+ getID
-                            +"' data-album='"+getAlbum+"' >"+ getName+"</a>");                  
+                        getSlug  = $gallery[i].slug; 
+                        Portfolio.UI.projectTemplate.find(".side").append("<a href='#' id='"+ getID
+                            +"' data-album='"+getAlbum
+							+"' data-slug='"+getSlug
+                            +"' >"+ getName+"</a>");                  
                     }); 
-                    //passed over click test
-                    Portfolio.UI.project.find(".side a").click(function(e) {                        
-                        e.preventDefault();
-                        Portfolio.CONFIG.active_album_title = $(this).data("album");    
-                        Portfolio.CONFIG.active_gallery = $(this).attr("id");               
-                        Portfolio.CONFIG.active_gallery_title = $(this).text();
-                        Portfolio.route.pushUrl();                      
-                    });
-
-                    Portfolio.UI.project.find(".closer").click(function() {
-                        Portfolio.navigation.home();                    
-                    });             
+                    Portfolio.navigation.project.init(); //attach handlers of left/right arrows and
                 },
                 create : function(pictures,slug) {
                     var $html = "", 
                         $pictures = pictures,
-                        $projectHolder = Portfolio.UI.project,
-                        $projectTitle  = $projectHolder.find("h2"),
-                        $projectDescription = $projectHolder.find(".gallery-description");
-                        $projectBody   = $projectHolder.find(".content"),
-                        $projectSide = $projectHolder.find(".side"),
+                        $projectHolder = Portfolio.UI.projects,
+                        $newProject = Portfolio.UI.projectTemplate.clone(true),                        
+                        $projectTitle  = $newProject.find("h2"),
+                        $projectDescription = $newProject.find(".gallery-description");
+                        $projectBody   = $newProject.find(".content"),
+                        $projectSide = $newProject.find(".side"),
                         getSlug = slug;
                     
-                    $projectSide.find("[data-album='"+Portfolio.CONFIG.active_album_slug+"']").addClass("enable");
+                    $newProject.attr("id","");
+                    $projectSide.find("a").not("[data-album='"+Portfolio.CONFIG.active_album_slug+"']").remove();
                     $projectTitle.html(Portfolio.CONFIG.active_gallery_title);
-                    //Retrieve main description of gallery and add it under first image         
+                    //Retrieve main desctription of gallery and add it under first image         
                     $projectDescription.html(Portfolio.navigation.gallery.getActive().find("p").text());
                     
                     $filePath = Portfolio.CONFIG.site_domain + Portfolio.CONFIG.site_root + Portfolio.CONFIG.gallery_images_path;
@@ -535,37 +556,43 @@ $(document).ready( function() {
                             $html += $pic_el;
                         }                   
                     }); 
+                    $projectSide.find("a#"+Portfolio.CONFIG.active_gallery).addClass("active");
+                    $projectBody.append($html);
                     $projectBody.css("background-image","url("+$filePath+getSlug+ "/bg.jpg)");
-                    $projectBody.html($html);                             
-                        $projectBody.parent().css("padding-top","50px").animate({paddingTop:'0px'},1500);        
-                    Portfolio.UI.project.find(".side a").removeClass("active").filter("#"+Portfolio.CONFIG.active_gallery).addClass("active");
+                    $projectBody.parent().css("padding-top","50px").animate({paddingTop:'0px'},1500);
+                    $projectHolder.prepend($newProject);                       
                 },
                 open : function() {
                     $("html,body").stop();
-                    //call openpopin
-                    
+                    //call openpopin                   
+                   
+                    Portfolio.UI.projectContainer.slide("in","right");                    
                     if(Portfolio.CONFIG.open_popin == "")  {
-                        Portfolio.UI.projectContainer.slide("in","right");
-                    } else  {
-                        Portfolio.UI.projectContainer.show();
-                        Portfolio.UI.project.show();
+                    	console.log("need to slide out previous one");
                     }
-                    Portfolio.UI.galleries.css("height",$(window).width()-Portfolio.UI.header.height());
-
-
+                    Portfolio.UI.galleries.hide();
                     Portfolio.template.blackScreen.show();
                     Portfolio.template.resize.scrollTop("static");              
-                    Portfolio.CONFIG.open_popin = "project";                
+                    Portfolio.CONFIG.open_popin = "project"; 
+
+                    if( Portfolio.UI.projects.children().size() > 1) {
+                    	//Close previous project by sliding it out
+                    	Portfolio.UI.projectContainer.slide("out","left");
+                    }
+                    
                 },
                 close : function() {
-                    //call closepopin                    
+                    //call closepopin                                        
+                    
+                    Portfolio.template.resize.scrollTop("static");
+                    
                     Portfolio.UI.projectContainer.slide("out","left", function()  {
                         Portfolio.template.blackScreen.hide();
                         var obj = Portfolio.navigation.gallery.getRecent();
                         if(obj!="") Portfolio.template.resize.scrollTop(obj.offset().top-obj.height()/2);                                           
                     });
                     
-                   Portfolio.UI.galleries.css("height","auto");
+                   Portfolio.UI.galleries.show();
                 }
             },      
             closepopin : function() {           
@@ -575,7 +602,7 @@ $(document).ready( function() {
                     Portfolio.CONFIG.open_popin = "";
                 }
             },
-            showreel : {
+            showreel : {  //template
                 init : function() {
                     Portfolio.UI.showreel.find(".closer").click(function(){
                         Portfolio.navigation.home();        
@@ -632,7 +659,7 @@ $(document).ready( function() {
                     Portfolio.CONFIG.open_popin = "";           
                 }
             },
-            about : {
+            about : {  //template
                 init : function() {
                     Portfolio.UI.about.find(".closer").click(function(){
                         Portfolio.navigation.home();        
@@ -652,7 +679,7 @@ $(document).ready( function() {
                     Portfolio.CONFIG.open_popin = "";               
                 }               
             },
-            blackScreen : {         
+            blackScreen : {  //template         
                 init : function() {
                     var createBlack = $("<div class='blackScreen'></div>");             
                     $("body").append(createBlack);
@@ -730,17 +757,19 @@ $(document).ready( function() {
                         console.log("executed case: home"); 
                         break; 
                     default : //PROJECT ACCESS
-                            if(Portfolio.CONFIG.first_time) { //If accessing a project directly through url
+                        if(Portfolio.CONFIG.first_time) { //If accessing a project directly through url
                             //if page requested is a gallery                
                             Portfolio.init("direct",function() {
                                 Portfolio.navigation.album.setActive(slugs[0]); 
                                 Portfolio.navigation.gallery.setActive(slugs[1]);   
                                 Portfolio.navigation.gallery.launch(slugs[1]); //Launch project     
-                            });
-                            
+                            });                            
                         } else {                
-                            Portfolio.navigation.album.setActive(slugs[0]); 
-                            Portfolio.navigation.gallery.setActive(slugs[1]);
+                        	//TODO : WHEN CLICKING from interface setactive is hit twice
+                            Portfolio.navigation.album.setActive(slugs[0]);                             
+                            if( Portfolio.active_gallery_slug != slugs[1] ) {
+                            	Portfolio.navigation.gallery.setActive(slugs[1]);	
+                            }
                             Portfolio.navigation.gallery.launch(slugs[1]); //Launch project 
                         }
                         console.log("executed case: default");                          
@@ -769,17 +798,17 @@ $(document).ready( function() {
             getFrom  = from || "left",
             getState  = state || "in",
             obj = this,
-            thisChild = this.first();
+            thisChild;
 
         if(getState == "in") {      
-            
+            thisChild = obj.find("#projects").children(":first");
             obj.show();
 
             if(getFrom == "left" || getFrom == "right") {           
                 if(getFrom=="left") {
                     calcLeft = -calcLeft;
                 }
-                obj.children(":first").css("left",calcLeft).show().animate({
+                thisChild.css("left",calcLeft).show().animate({
                     left : 0
                 },800,"easeInOutCirc");
             }
@@ -787,19 +816,20 @@ $(document).ready( function() {
                 if(getFrom=="top") {
                     calcTop = -calcTop;
                 }
-                obj.children(":first").css("top",calcTop).show().animate({
+                thisChild.css("top",calcTop).show().animate({
                     top : 0
                 },800,"easeInOutCirc");
             }
         } else {
+            thisChild = obj.find("#projects").children(":last");
             if(getFrom == "left" || getFrom == "right") {           
                 if(getFrom=="left") {
                     calcLeft = -calcLeft;
                 }
-                obj.children(":first").css("left",0).animate({
+                thisChild.css("left",0).animate({
                     left : calcLeft
                 },500,"easeInOutQuad",function() {
-                    obj.hide();
+                    thisChild.remove();
 
                     if(typeof callback == 'function'){
                         callback.call(this);
@@ -811,10 +841,10 @@ $(document).ready( function() {
                 if(getFrom=="bottom") {
                     calcTop = -calcTop;
                 }
-                obj.children(":first").css("top",0).animate({
+                thisChild.css("top",0).animate({
                     top : calcTop
                 },500,"easeInOutQuad",function() {
-                    obj.hide();
+                    thisChild.remove();
 
                     if(typeof callback == 'function'){
                         callback.call(this);

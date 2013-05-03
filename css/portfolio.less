@@ -121,8 +121,8 @@ html { -webkit-font-smoothing: antialiased; }
  /************  Z-INDEXES **************/
 .goTop							{ z-index: 620; }
 #showreel, #about				{ z-index: 600; }
-#galleries-container .left , 
-#galleries-container .right,
+#project-container .left , 
+#project-container .right,
 #galleries-container #layouts 	{ z-index: 550; }
 #project-container .closer		{ z-index: 460; }
 #project-container .side		{ z-index: 450; }
@@ -373,30 +373,7 @@ aside {
 	left: @asideWidth;
 	right: 0;
 	position: absolute;
-	margin-top: @headerHeight !important;
-	
-	.left , .right {
-		.icon;
-		position: fixed;
-		top: 50%;
-		margin-top: -25px;
-		background-color: #e3e3e3;
-		text-align: center;
-		color: #929292;
-		font-family: 'Custom-Bold';
-		font-size: 12px;
-		.transition(all,0.5s);
-		opacity: 0;
-		cursor: pointer;
-	}
-	.left {
-		left: @asideWidth;
-		background-position: 0 -197px;
-	}
-	.right {
-		right:0;
-		background-position: -50px -197px;
-	}
+	margin-top: @headerHeight !important;	
 
 	/****************** BLOG MODE ******************/
 	&.blogMode {
@@ -484,6 +461,7 @@ aside {
 	}
 	#galleries {
 		height: 100%;
+		overflow: hidden;
 		.element {			
 			overflow: hidden;			
 			cursor: pointer;
@@ -523,9 +501,33 @@ aside {
 	width: 100%;
 	max-width: 960px;
 	margin: 30px auto 0 auto; 
-	#project {
+
+	.left , .right {
+		.icon;
+		position: fixed;
+		top: 50%;
+		margin-top: -25px;
+		background-color: #e3e3e3;
+		text-align: center;
+		color: #929292;
+		font-family: 'Custom-Bold';
+		font-size: 12px;
+		.transition(all,0.5s);
+		opacity: 1;
+		cursor: pointer;
+	}
+	.left {
+		left: 0;
+		background-position: 0 -197px;
+	}
+	.right {
+		right:0;
+		background-position: -50px -197px;
+	}
+
+	.project {		
 		display: none;
-		position: relative;
+		position: relative;		
 		.header {
 			.closer {
 				.closerButton;
@@ -547,8 +549,8 @@ aside {
 					color: #3e3e3e;
 				}
 				a {
-					display: none;
-					&.enable {	display: block;	}
+					display: block;
+					
 					.transition(all,0.5s);
 					text-decoration: none;
 					color: #505050;
@@ -722,4 +724,8 @@ aside {
 		margin-top: -80px;
 		float: right;
 	}
+}
+
+#template.project {
+	display: none;
 }
