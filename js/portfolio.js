@@ -69,7 +69,8 @@ $(document).ready( function() {
             "showreel_url"          : "http://www.youtube.com/embed/zh8xD8BE2YA?autoplay=1&hd=1",
             "video_size"            : 0.7, //YouTube player, values is % width/height of screen
             "player"                : "",
-            "playerLoaded"          : false
+            "playerLoaded"          : false,
+            "isInMotion"            : false
         },
         GLOBAL : {
             "History"           : window.History
@@ -309,11 +310,6 @@ $(document).ready( function() {
                         callback.call(this);
                     }
                 },
-                /**
-                * launch this class launches a gallery
-                * @param  {string} slug:This is the slug
-                * @return {null}
-                */
                 launch : function(slug) {
                     if(slug != "2012") {
                         getPictures = Portfolio.getdata.pictures(Portfolio.UI.galleries.find(".gallery-holder[data-slug='"+slug+"']").attr("id"));
@@ -325,7 +321,6 @@ $(document).ready( function() {
                     }
                 },
                 //returns the active gallery within the list as a DOM element
-
                 getActive : function() {                
                     if(Portfolio.CONFIG.active_gallery!="") {
                         var obj = Portfolio.UI.galleries.find("#"+Portfolio.CONFIG.active_gallery);
@@ -369,9 +364,18 @@ $(document).ready( function() {
                     Portfolio.UI.projectContainer.find(".left.nav").click(function() {
                     	Portfolio.UI.projects.children(":first").find(".side a.active").prev().trigger("click");	
                     });
+
+                    $(document).keyup(function(e) {
+                        if      (e.keyCode == 39) { Portfolio.UI.projects.children(":first").find(".side a.active").next().trigger("click"); }   // left
+                        else if (e.keyCode == 37) { Portfolio.UI.projects.children(":first").find(".side a.active").prev().trigger("click"); }   // right
+                    });
+                    
             	},
                 isSlideForward : function()  {
-                    var recentIndex = Portfolio.UI.projects.children(":first").find(".side a#"+Portfolio.CONFIG.recent_gallery).index();
+                    if( Portfolio.CONFIG.recent_gallery != "" ) {
+                        var recentIndex = Portfolio.UI.projects.children(":first").find(".side a#"+Portfolio.CONFIG.recent_gallery).index();    
+                    }
+                    
                     var activeIndex = Portfolio.UI.projects.children(":first").find(".side a#"+Portfolio.CONFIG.active_gallery).index();
                     return (activeIndex > recentIndex) ? true : false;
                 }
@@ -496,26 +500,19 @@ $(document).ready( function() {
                 },
                 open : function() {
                     $("html,body").stop();
-                    //call openpopin                   
+                    //call openpopin
                    var inDirection,outDirection;
 
                     if(Portfolio.navigation.project.isSlideForward())  {
-                        inDirection = "right";
-                        outDirection = "left";
+                        inDirection = "right";outDirection = "left";
                     } else  {
-                        inDirection = "left";
-                        outDirection = "right";
+                        inDirection = "left";outDirection = "right";
                     }
-
-                    Portfolio.UI.projectContainer.slide("in",inDirection);
-                    if(Portfolio.CONFIG.open_popin == "")  {
-                    	console.log("need to slide out previous one");
-                    }
+                    Portfolio.UI.projectContainer.slide("in",inDirection);                    
                     Portfolio.UI.galleries.hide();
                     Portfolio.template.blackScreen.show();
                     Portfolio.template.resize.scrollTop("static");
                     Portfolio.CONFIG.open_popin = "project"; 
-
                     if( Portfolio.UI.projects.children().size() > 1) {
                     	//Close previous project by sliding it out
                     	Portfolio.UI.projectContainer.slide("out",outDirection);
@@ -524,26 +521,25 @@ $(document).ready( function() {
                 close : function() {
                     //call closepopin
                     Portfolio.template.resize.scrollTop("static");
-                    Portfolio.UI.projectContainer.slide("out",left, function()  {
+                    Portfolio.UI.projectContainer.slide("out","left", function()  {
                         Portfolio.template.blackScreen.hide();
                         var obj = Portfolio.navigation.gallery.getRecent();
                         if(obj!="") Portfolio.template.resize.scrollTop(obj.offset().top-obj.height()/2);                                           
                     });
-                    
                    Portfolio.UI.galleries.show();
                 }
-            },      
-            closepopin : function() {           
+            },
+            closepopin : function() {
                 if(Portfolio.CONFIG.open_popin !="") {
                     console.log("closing");
-                    Portfolio.template[Portfolio.CONFIG.open_popin].close();    
+                    Portfolio.template[Portfolio.CONFIG.open_popin].close();
                     Portfolio.CONFIG.open_popin = "";
                 }
             },
             showreel : {  //template
                 init : function() {
                     Portfolio.UI.showreel.find(".closer").click(function(){
-                        Portfolio.navigation.home();        
+                        Portfolio.navigation.home();
                     });                         
                     //Load video through youtube api
                     var tag = document.createElement('script');
@@ -702,12 +698,15 @@ $(document).ready( function() {
                                 Portfolio.navigation.gallery.launch(slugs[1]); //Launch project     
                             });                            
                         } else {                
-                        	//TODO : WHEN CLICKING from interface setactive is hit twice
-                            Portfolio.navigation.album.setActive(slugs[0]);                             
-                            if( Portfolio.CONFIG.active_gallery_slug != slugs[1] ) {
-                            	Portfolio.navigation.gallery.setActive(slugs[1]);	
+                        	
+                            if(!Portfolio.CONFIG.isInMotion) {
+                                Portfolio.navigation.album.setActive(slugs[0]);                             
+                                if( Portfolio.CONFIG.active_gallery_slug != slugs[1] ) {
+                                	Portfolio.navigation.gallery.setActive(slugs[1]);	
+                                }
+                                Portfolio.navigation.gallery.launch(slugs[1]); //Launch project 
                             }
-                            Portfolio.navigation.gallery.launch(slugs[1]); //Launch project 
+
                         }
                         console.log("executed case: default");                          
                 }
@@ -738,17 +737,23 @@ $(document).ready( function() {
                 if(getFrom=="left") {
                     calcLeft = -calcLeft;
                 }
+                Portfolio.CONFIG.isInMotion = true;
                 thisChild.css("left",calcLeft).show().animate({
                     left : 0
-                },800,"easeInOutCirc");
+                },800,"easeInOutCirc",function() {
+                    Portfolio.CONFIG.isInMotion = false;
+                });
             }
             if(getFrom == "top" || getFrom == "bottom") {           
                 if(getFrom=="top") {
                     calcTop = -calcTop;
                 }
+                Portfolio.CONFIG.isInMotion = true;
                 thisChild.css("top",calcTop).show().animate({
                     top : 0
-                },800,"easeInOutCirc");
+                },800,"easeInOutCirc",function() {
+                    Portfolio.CONFIG.isInMotion = false;
+                });
             }
         } else {
             thisChild = obj.find("#projects").children(":last");
@@ -756,11 +761,12 @@ $(document).ready( function() {
                 if(getFrom=="left") {
                     calcLeft = -calcLeft;
                 }
+                Portfolio.CONFIG.isInMotion = true;
                 thisChild.css("left",0).animate({
                     left : calcLeft
                 },500,"easeInOutQuad",function() {
                     thisChild.remove();
-
+                    Portfolio.CONFIG.isInMotion = false;
                     if(typeof callback == 'function'){
                         callback.call(this);
                     }
@@ -771,11 +777,12 @@ $(document).ready( function() {
                 if(getFrom=="bottom") {
                     calcTop = -calcTop;
                 }
+                Portfolio.CONFIG.isInMotion = true;
                 thisChild.css("top",0).animate({
                     top : calcTop
                 },500,"easeInOutQuad",function() {
                     thisChild.remove();
-
+                    Portfolio.CONFIG.isInMotion = false;
                     if(typeof callback == 'function'){
                         callback.call(this);
                     }
