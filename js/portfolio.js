@@ -1,84 +1,7 @@
-  /**********************************************************
-  ******************* Portfolio 2013         ****************
-  ******************* Author : Loren Grixti  ****************
- ************************************************************/
-
-/* APPLICATION MAP :
-/****************************************************
-
-Portfolio = {
-        init :                  function(mode,callback) {},
-        UI:                     {},     
-        CONFIG :                {},
-        GLOBAL :                {}
-        getdata = {
-            init:               function(callback) {},
-            albums :            function() {},      
-            galleries :         function(callback) {},
-            pictures :          function(gid) {}
-        navigation = {
-            init :              function(mode) {},
-            home :              function() {},
-            album : {           
-                create :        function(getAlbums) {},
-                show :          function() {},
-                activate :      function(slug) {},
-                launch :        function(albumSlug) {}
-            gallery : {
-                create :        function(callback) {},
-                launch :        function(slug) {},
-                getActive :     function() {},
-                getRecent :     function() {},
-                setActive :     function(slug) {}
-        template = {
-            init :              function() {},
-            resize : {
-                init :          function() {},
-                albums:         function() {},
-                scrollTop:      function(mode) {},
-                scrollBottom:   function(mode) {}
-            gallery : {
-                initTogglers :  function() {},
-                show :          function() {},
-                hide :          function() {},
-                posterMode :    function() {},
-                tileMode :      function() {},
-                blogMode :      function() {}
-            project : {
-                init :          function() {},
-                create :        function(pictures,slug) {},
-                open :          function() {},
-                close :         function() {}
-            closepopin :        function() {},
-            showreel : {
-                init :          function() {},
-                loaded :        function() {},
-                ready :         function(event) {},
-                pause :         function(event) {},
-                play :          function(event) {},
-                create :        function() {},
-                open :          function() {},
-                center :        function() {},
-                close :         function() {}
-            about :             {
-                init :          function() {},
-                open :          function() {},
-                close :         function() {}
-            blackScreen : {         
-                init :          function() {},
-                show :          function() {},
-                hide :          function() {}
-        route = {
-            init:               function(){},
-            setChangeEvent:     function(){},
-            pushThis :          function(pushIt) {},
-            pushUrl:            function() {},
-            go:                 function() {}       
-
-*********** Extend functions ************************
-            centerThis :        function()  
-            slide :             function(state,from)
-****************************************************/
+//////////////////////////
+//Portfolio 2013 SPA    //
+//Author : Loren Grixti //
+//////////////////////////
 
 $(document).ready( function() {
 
@@ -257,6 +180,7 @@ $(document).ready( function() {
                 Portfolio.navigation.album.launch();
             },
             home : function() { //navigation
+                console.log("going home");
                 Portfolio.CONFIG.recent_gallery = Portfolio.CONFIG.active_gallery;
                 Portfolio.CONFIG.active_gallery = "";
                 Portfolio.route.pushUrl();  
@@ -385,6 +309,11 @@ $(document).ready( function() {
                         callback.call(this);
                     }
                 },
+                /**
+                * launch this class launches a gallery
+                * @param  {string} slug:This is the slug
+                * @return {null}
+                */
                 launch : function(slug) {
                     if(slug != "2012") {
                         getPictures = Portfolio.getdata.pictures(Portfolio.UI.galleries.find(".gallery-holder[data-slug='"+slug+"']").attr("id"));
@@ -396,6 +325,7 @@ $(document).ready( function() {
                     }
                 },
                 //returns the active gallery within the list as a DOM element
+
                 getActive : function() {                
                     if(Portfolio.CONFIG.active_gallery!="") {
                         var obj = Portfolio.UI.galleries.find("#"+Portfolio.CONFIG.active_gallery);
@@ -412,13 +342,11 @@ $(document).ready( function() {
                         return "";
                     }
                 },
-                setActive : function(slug) {            
-                    console.log("setActive fn b4 : recent_gallery : " + Portfolio.CONFIG.recent_gallery + " /   active_gallery  : "+Portfolio.CONFIG.active_gallery);
+                setActive : function(slug) {                                
                     Portfolio.CONFIG.recent_gallery 	  = Portfolio.CONFIG.active_gallery;
                     Portfolio.CONFIG.active_gallery_slug = slug;
                     Portfolio.CONFIG.active_gallery_title = Portfolio.UI.galleries.find(".gallery-holder[data-slug='"+slug+"'] h2").text(); 
-                    Portfolio.CONFIG.active_gallery       = Portfolio.UI.galleries.find(".gallery-holder[data-slug='"+slug+"']").attr("id");
-                    console.log("setActive fn : recent_gallery : " + Portfolio.CONFIG.recent_gallery + " /   active_gallery  : "+Portfolio.CONFIG.active_gallery);
+                    Portfolio.CONFIG.active_gallery       = Portfolio.UI.galleries.find(".gallery-holder[data-slug='"+slug+"']").attr("id");                    
                 }
             },
             project : { //navigation
@@ -440,9 +368,13 @@ $(document).ready( function() {
                     }); 
                     Portfolio.UI.projectContainer.find(".left.nav").click(function() {
                     	Portfolio.UI.projects.children(":first").find(".side a.active").prev().trigger("click");	
-                    });   
-                    //Todo : change animation direction of going to previous project       
-            	}	
+                    });
+            	},
+                isSlideForward : function()  {
+                    var recentIndex = Portfolio.UI.projects.children(":first").find(".side a#"+Portfolio.CONFIG.recent_gallery).index();
+                    var activeIndex = Portfolio.UI.projects.children(":first").find(".side a#"+Portfolio.CONFIG.active_gallery).index();
+                    return (activeIndex > recentIndex) ? true : false;
+                }
             }   
         },  
         template : {
@@ -565,28 +497,34 @@ $(document).ready( function() {
                 open : function() {
                     $("html,body").stop();
                     //call openpopin                   
-                   
-                    Portfolio.UI.projectContainer.slide("in","right");                    
+                   var inDirection,outDirection;
+
+                    if(Portfolio.navigation.project.isSlideForward())  {
+                        inDirection = "right";
+                        outDirection = "left";
+                    } else  {
+                        inDirection = "left";
+                        outDirection = "right";
+                    }
+
+                    Portfolio.UI.projectContainer.slide("in",inDirection);
                     if(Portfolio.CONFIG.open_popin == "")  {
                     	console.log("need to slide out previous one");
                     }
                     Portfolio.UI.galleries.hide();
                     Portfolio.template.blackScreen.show();
-                    Portfolio.template.resize.scrollTop("static");              
+                    Portfolio.template.resize.scrollTop("static");
                     Portfolio.CONFIG.open_popin = "project"; 
 
                     if( Portfolio.UI.projects.children().size() > 1) {
                     	//Close previous project by sliding it out
-                    	Portfolio.UI.projectContainer.slide("out","left");
+                    	Portfolio.UI.projectContainer.slide("out",outDirection);
                     }
-                    
                 },
                 close : function() {
-                    //call closepopin                                        
-                    
+                    //call closepopin
                     Portfolio.template.resize.scrollTop("static");
-                    
-                    Portfolio.UI.projectContainer.slide("out","left", function()  {
+                    Portfolio.UI.projectContainer.slide("out",left, function()  {
                         Portfolio.template.blackScreen.hide();
                         var obj = Portfolio.navigation.gallery.getRecent();
                         if(obj!="") Portfolio.template.resize.scrollTop(obj.offset().top-obj.height()/2);                                           
@@ -699,7 +637,7 @@ $(document).ready( function() {
         route : {
             init: function(){
                 Portfolio.route.setChangeEvent();               
-            },
+            },           
             setChangeEvent: function(){
                 Portfolio.GLOBAL.History.Adapter.bind(window,'statechange',function(){
                     Portfolio.route.go();
@@ -714,8 +652,7 @@ $(document).ready( function() {
                     friendly_gallery_slug = Portfolio.UI.galleries.find(".gallery-holder#"+Portfolio.CONFIG.active_gallery).data("slug");
                     friendly_album = Portfolio.CONFIG.active_album_title;
                     friendly_gallery = "/"+friendly_gallery_slug;
-                }
-                
+                }                
                 Portfolio.GLOBAL.History.pushState(null, null, '/'+Portfolio.CONFIG.site_root+friendly_album+friendly_gallery);
             },
             go: function() {                    
@@ -767,7 +704,7 @@ $(document).ready( function() {
                         } else {                
                         	//TODO : WHEN CLICKING from interface setactive is hit twice
                             Portfolio.navigation.album.setActive(slugs[0]);                             
-                            if( Portfolio.active_gallery_slug != slugs[1] ) {
+                            if( Portfolio.CONFIG.active_gallery_slug != slugs[1] ) {
                             	Portfolio.navigation.gallery.setActive(slugs[1]);	
                             }
                             Portfolio.navigation.gallery.launch(slugs[1]); //Launch project 
@@ -778,13 +715,6 @@ $(document).ready( function() {
             }           
         }
     }
-    if($("html").hasClass("lt-ie8")) {
-        //Minimum requirements for IE is version 8
-        $("body").html("<div><br>Sorry, you need at least Internet Explorer V8 to view this site.</div>");
-    } else {            
-        Portfolio.route.go();       
-    }
-
     //EXTEND FUNCTIONS
     $.fn.centerThis = function () { //this centers objects in the center of the screen  
         this.css("top",  ( $(window).height() - this.height() ) / 2 );
@@ -853,9 +783,9 @@ $(document).ready( function() {
             }
         }
     };
-
+    Portfolio.route.go();
 });
-
+ 
 function onYouTubeIframeAPIReady() {
     Portfolio.template.showreel.loaded();   
 }
