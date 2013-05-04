@@ -36,7 +36,8 @@ $(document).ready( function() {
             "projects"              : $("#project-container #projects"),
             "projectTemplate"       : $(".project#template"),
             "showreel"              : $("#super-container>#showreel"),
-            "about"                 : $("#super-container>#about")  
+            "aboutContainer"        : $("#about-container"),
+            "about"                 : $("#about-container #about")  
         },      
         //Create arrays for albums galleries and pictures
         DATASOURCES : {
@@ -508,21 +509,22 @@ $(document).ready( function() {
                     } else  {
                         inDirection = "left";outDirection = "right";
                     }
-                    Portfolio.UI.projectContainer.slide("in",inDirection);                    
+                    Portfolio.UI.projectContainer.slide("in",inDirection,"#projects","slide");                    
                     Portfolio.UI.galleries.hide();
                     Portfolio.template.blackScreen.show();
                     Portfolio.template.resize.scrollTop("static");
                     Portfolio.CONFIG.open_popin = "project"; 
                     if( Portfolio.UI.projects.children().size() > 1) {
                     	//Close previous project by sliding it out
-                    	Portfolio.UI.projectContainer.slide("out",outDirection);
+                    	Portfolio.UI.projectContainer.slide("out",outDirection,"#projects","slide");
                     }
                 },
                 close : function() {
                     //call closepopin
                     Portfolio.template.resize.scrollTop("static");
-                    Portfolio.UI.projectContainer.slide("out","left", function()  {
+                    Portfolio.UI.projectContainer.slide("out","left","#projects","slide", function()  {
                         Portfolio.template.blackScreen.hide();
+                        Portfolio.UI.projectContainer.hide();
                         var obj = Portfolio.navigation.gallery.getRecent();
                         if(obj!="") Portfolio.template.resize.scrollTop(obj.offset().top-obj.height()/2);                                           
                     });
@@ -574,7 +576,8 @@ $(document).ready( function() {
                 },
                 open : function() {
                     Portfolio.UI.showreel.show();
-                    Portfolio.template.showreel.center();   
+                    //Portfolio.template.showreel.center(); 
+                    Portfolio.UI.showreel.centerThis();  
                     Portfolio.template.showreel.play();
                     Portfolio.template.blackScreen.show();
                     Portfolio.CONFIG.open_popin = "showreel";
@@ -594,23 +597,26 @@ $(document).ready( function() {
                 }
             },
             about : {  //template
-                init : function() {
-                    Portfolio.UI.about.find(".closer").click(function(){
-                        Portfolio.navigation.home();        
+                init : function() {                    
+                     Portfolio.UI.about.find(".closer").click(function(){
+                        Portfolio.navigation.home(); 
                     }); 
                 },
                 open : function() {
                     console.log("opening about");
-                    Portfolio.UI.about.show();
-                    Portfolio.UI.about.show();
-                    Portfolio.UI.about.centerThis();
+                    
+                    Portfolio.UI.aboutContainer.centerThis();
+                    Portfolio.UI.aboutContainer.slide("in","top",".panel-container","single");
+                    
                     Portfolio.template.blackScreen.show();
                     Portfolio.CONFIG.open_popin = "about";
                 },
                 close : function() {
-                    Portfolio.UI.about.hide();
-                    Portfolio.template.blackScreen.hide();
-                    Portfolio.CONFIG.open_popin = "";               
+                    Portfolio.UI.aboutContainer.slide("out","bottom",".panel-container","single",function(){
+	                    Portfolio.UI.aboutContainer.hide();
+	                    Portfolio.template.blackScreen.hide();
+	                    Portfolio.CONFIG.open_popin = "";               
+                    });
                 }               
             },
             blackScreen : {  //template         
@@ -720,7 +726,7 @@ $(document).ready( function() {
             this.css("left", ( $(window).width()  - this.width()  ) / 2 );
             return this;       
     };  
-    $.fn.slide = function(state,from,callback) { //this slides in elements from any corner of the screen
+    $.fn.slide = function(state,from,target,mode,callback) { //this slides in elements from any corner of the screen
         
         var calcLeft = this.width()+(($(window).width()-this.width())/2),
             calcTop  = this.height()+(($(window).height()-this.height())/2),
@@ -730,7 +736,8 @@ $(document).ready( function() {
             thisChild;
 
         if(getState == "in") {      
-            thisChild = obj.find("#projects").children(":first");
+            thisChild = obj.find(target).children(":first");	
+            
             obj.show();
 
             if(getFrom == "left" || getFrom == "right") {           
@@ -745,7 +752,7 @@ $(document).ready( function() {
                 });
             }
             if(getFrom == "top" || getFrom == "bottom") {           
-                if(getFrom=="top") {
+                if(getFrom == "top") {
                     calcTop = -calcTop;
                 }
                 Portfolio.CONFIG.isInMotion = true;
@@ -756,7 +763,7 @@ $(document).ready( function() {
                 });
             }
         } else {
-            thisChild = obj.find("#projects").children(":last");
+            thisChild = obj.find(target).children(":last");	
             if(getFrom == "left" || getFrom == "right") {           
                 if(getFrom=="left") {
                     calcLeft = -calcLeft;
@@ -765,7 +772,11 @@ $(document).ready( function() {
                 thisChild.css("left",0).animate({
                     left : calcLeft
                 },500,"easeInOutQuad",function() {
-                    thisChild.remove();
+                    
+                    if(mode == "slide") {
+                    	thisChild.remove();	
+                    }
+                    
                     Portfolio.CONFIG.isInMotion = false;
                     if(typeof callback == 'function'){
                         callback.call(this);
@@ -775,13 +786,15 @@ $(document).ready( function() {
             if(getFrom == "top" || getFrom == "bottom") {           
                 
                 if(getFrom=="bottom") {
-                    calcTop = -calcTop;
+                    calcTop = calcTop;
                 }
                 Portfolio.CONFIG.isInMotion = true;
                 thisChild.css("top",0).animate({
                     top : calcTop
-                },500,"easeInOutQuad",function() {
-                    thisChild.remove();
+                },500,"easeInOutQuad",function() {                    
+                    if(mode == "slide") {
+                    	thisChild.remove();	
+                    }                   
                     Portfolio.CONFIG.isInMotion = false;
                     if(typeof callback == 'function'){
                         callback.call(this);
