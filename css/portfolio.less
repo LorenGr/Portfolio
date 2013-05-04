@@ -413,10 +413,10 @@ aside {
 			}
 			height:0;
 			@bgSpeed : 2s;
-			-webkit-transition: opacity 0.2s,background-position @bgSpeed,background-size @bgSpeed,height 0.5s;
-			-moz-transition: opacity 0.2s,background-position @bgSpeed,background-size @bgSpeed,height 0.5s;
-			-o-transition: opacity 0.2s,background-position @bgSpeed,background-size @bgSpeed,height 0.5s;
-			transition: opacity 0.2s,background-position @bgSpeed,background-size @bgSpeed,height 0.5s;
+			-webkit-transition: opacity 0.2s,height 0.5s;
+			-moz-transition: opacity 0.2s,height 0.5s;
+			-o-transition: opacity 0.2s,height 0.5s;
+			transition: opacity 0.2s,height 0.5s;
 			opacity:0;
 			&:hover {
 				opacity:0.9;
@@ -424,10 +424,7 @@ aside {
 					opacity: 1; 
 					background-size: 47px 47px;
 				}				
-				background-size: @posterWidth+20px auto;
-				background-position: center left;
-				background-position-x: -13px;
-				background-position-y: center;			
+					
 			}
 			width: 100%;
 						
