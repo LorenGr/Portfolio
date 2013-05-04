@@ -65,7 +65,7 @@ $(document).ready( function() {
             "active_gallery_slug"   : "",           
             "album_filters"         : ".web-design", //first type of projects to show by default
             "resize_timer"          : 0,
-            "gallery_mode"          : "blogMode", //default mode on init
+            "gallery_mode"          : "blogMode", //default mode on init (blogMode / tileMode)
             "open_popin"            : "", //store name of which popen is open currently
             "showreel_url"          : "http://www.youtube.com/embed/zh8xD8BE2YA?autoplay=1&hd=1",
             "video_size"            : 0.7, //YouTube player, values is % width/height of screen
@@ -250,12 +250,18 @@ $(document).ready( function() {
             },
             gallery : { //navigation
             	initTogglers : function() {
-                    Portfolio.UI.galleriesContainer.find("#layouts a").click(function() {
+                    Portfolio.UI.root.find("#layouts a").click(function(e) {
+                        e.preventDefault();                        
                         $newGalleryMode = $(this).attr("id");
+                        Portfolio.navigation.gallery.setToggler($newGalleryMode);
                         Portfolio.UI.galleriesContainer.removeClass(Portfolio.CONFIG.gallery_mode).addClass($newGalleryMode);
                         Portfolio.CONFIG.gallery_mode = $newGalleryMode;
                         Portfolio.template.gallery[$newGalleryMode]();
                     });
+                },
+                setToggler : function(getMode) {
+            		Portfolio.UI.root.find("#layouts a").removeClass("active");
+                    Portfolio.UI.root.find("#layouts a#"+getMode).addClass("active");
                 },
                 create : function(callback) {
                     var $html      = "",    
@@ -304,8 +310,9 @@ $(document).ready( function() {
                     $galleriesContainer.addClass($galleryMode);
                                     
                     //Call gallery layout mode template
-                    //Portfolio.navigation.gallery.initTogglers();
-                    //Portfolio.template.gallery[$galleryMode]();
+                    Portfolio.navigation.gallery.initTogglers();
+                    Portfolio.template.gallery[$galleryMode]();
+                    Portfolio.navigation.gallery.setToggler($galleryMode);
 
                     if(typeof callback == 'function'){
                         callback.call(this);
@@ -439,7 +446,7 @@ $(document).ready( function() {
                 },
                 blogMode : function() {
 
-                }
+                }              
             },
             project : {  //template
                 init : function() {
@@ -498,7 +505,7 @@ $(document).ready( function() {
                     $projectSide.find("a#"+Portfolio.CONFIG.active_gallery).addClass("active");
                     $projectBody.append($html);
                     $projectBody.css("background-image","url("+$filePath+getSlug+ "/bg.jpg)");
-                    $projectBody.parent().css("padding-top","50px").animate({paddingTop:'0px'},1500);
+                    $projectBody.parent().css("padding-left","50px").animate({paddingLeft:'0px'},1500);
                     $projectHolder.prepend($newProject);                       
                 },
                 open : function() {
@@ -749,7 +756,7 @@ $(document).ready( function() {
                 Portfolio.CONFIG.isInMotion = true;
                 thisChild.css("left",calcLeft).show().animate({
                     left : 0
-                },800,"easeInOutCirc",function() {
+                },800,"easeInOutExpo",function() {
                     Portfolio.CONFIG.isInMotion = false;
                 });
             }
@@ -760,7 +767,7 @@ $(document).ready( function() {
                 Portfolio.CONFIG.isInMotion = true;
                 thisChild.css("top",calcTop).show().animate({
                     top : 0
-                },800,"easeInOutCirc",function() {
+                },800,"easeInOutExpo",function() {
                     Portfolio.CONFIG.isInMotion = false;
                 });
             }
@@ -773,7 +780,7 @@ $(document).ready( function() {
                 Portfolio.CONFIG.isInMotion = true;
                 thisChild.css("left",0).animate({
                     left : calcLeft
-                },500,"easeInOutQuad",function() {
+                },500,"easeInOutExpo",function() {
                     
                     if(mode == "slide") {
                     	thisChild.remove();	
@@ -793,7 +800,7 @@ $(document).ready( function() {
                 Portfolio.CONFIG.isInMotion = true;
                 thisChild.css("top",0).animate({
                     top : calcTop
-                },500,"easeInOutQuad",function() {                    
+                },500,"easeInOutExpo",function() {                    
                     if(mode == "slide") {
                     	thisChild.remove();	
                     }                   
