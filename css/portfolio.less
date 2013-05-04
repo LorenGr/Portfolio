@@ -146,6 +146,10 @@ body {
 	font-family: 'Custom-Bold';
 	color: white;
 
+	overflow-x: hidden;
+	overflow-y: visible;
+
+
 	/*SITE LAUNCH INTERFACE ANIMATION*/
 	&.intro aside nav {
 		.transition(left,0.6s);
@@ -526,11 +530,17 @@ aside {
 	margin: 30px auto 0 auto; 
 
 	.left , .right {
-		.icon;
+		width: 50px;
 		position: fixed;
-		top: 50%;
-		margin-top: -25px;
-		background-color: #e3e3e3;
+		top: 0;
+		height: 100%;
+		background-image:url("../img/arrows.png");
+		background-color: #1d1d1d;
+		background-color: rgba(29,29,29,0.6);	
+		
+		&:hover {
+			background-color: #2c2c2c;	
+		}
 		text-align: center;
 		color: #929292;
 		font-family: 'Custom-Bold';
@@ -541,11 +551,11 @@ aside {
 	}
 	.left {
 		left: 0;
-		background-position: 0 -197px;
+		background-position: 14px center;
 	}
 	.right {
 		right:0;
-		background-position: -50px -197px;
+		background-position: -33px center;
 	}
 
 	.project {		
