@@ -375,6 +375,8 @@ $(document).ready( function() {
                 isSlideForward : function()  {
                     if( Portfolio.CONFIG.recent_gallery != "" ) {
                         var recentIndex = Portfolio.UI.projects.children(":first").find(".side a#"+Portfolio.CONFIG.recent_gallery).index();    
+                    } else {
+                    	return true;
                     }
                     
                     var activeIndex = Portfolio.UI.projects.children(":first").find(".side a#"+Portfolio.CONFIG.active_gallery).index();
