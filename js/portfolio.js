@@ -28,7 +28,6 @@ $(document).ready( function() {
         UI: {
             "root"                  : $("#super-container"),
             "nav"                   : $("nav"),
-            "header"                : $("header"),
             "navContainer"          : $("aside"),
             "galleriesContainer"    : $("#galleries-container"),
             "galleries"             : $("#galleries-container #galleries"),
@@ -158,7 +157,7 @@ $(document).ready( function() {
                     $("body").removeClass("intro");
                 }
                 Portfolio.UI.root.addClass("enable");
-                Portfolio.UI.header.addClass("enable");
+               
                 
                 $(document).keyup(function(e) {
                   if (e.keyCode == 27) { Portfolio.navigation.home(); }   // esc
@@ -170,7 +169,7 @@ $(document).ready( function() {
                         $(".goTop").addClass("enable");                 
                     }
                 }); 
-                $(".links #about").click( function(e) {
+               	Portfolio.UI.nav.find("#about").click( function(e) {
                     e.preventDefault();
                     Portfolio.route.pushThis("about");
                 });
