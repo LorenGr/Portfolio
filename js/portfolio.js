@@ -208,7 +208,7 @@ $(document).ready( function() {
                         $nav_el = "<a class='album-links "+addClass+"' href='#' data-slug="+getSlug+" id="+getID+"><span>"+getName+"</span></a>";               
                         $html += $nav_el;
                     });
-                    Portfolio.UI.nav.append($html);
+                    Portfolio.UI.nav.prepend($html);
                     //over click test passed
                     Portfolio.UI.nav.find(".album-links").click( function(e){
                         e.preventDefault();

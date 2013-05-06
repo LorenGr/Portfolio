@@ -17,6 +17,11 @@ html { -webkit-font-smoothing: antialiased; }
 @sprite : url("../img/sprite.png");
 @dotted : url("../img/dotted.png");
 
+@minTabletMode 		: 990px;
+@maxTabletMode 		: 991px;
+
+@mobileMode 		: 320px;
+
  /************  MIXINS **************/
 @ui-border : 1px solid #353535;
 .ui-border {
@@ -223,22 +228,29 @@ body {
 	background-position:-100px -195px;
 	background-repeat:no-repeat;
 	border:1px solid #cdcdcd;
+	.box-sizing;
 }
 
+.mainTitle {
+	font-size: 0;		
+	float: left;
+	cursor: default;
+	width: @asideWidth;		
+	.box-sizing;
+	height: 120px;		
+	background-image: @sprite;
+	background-position: 29px -504px;
+	background-repeat: no-repeat;
 
-aside {
+}
 
-	p.mainTitle {
-		font-size: 0;		
-		float: left;
-		cursor: default;
-		width: @asideWidth;		
-		.box-sizing;
-		height: 120px;		
-		background-image: @sprite;
-		background-position: 29px -504px;
-		background-repeat: no-repeat;		 
+header  {
+	display: none;
+	.mainTitle  {		
+		background-position: 102px -532px;
 	}
+}
+aside {	
 	p.links {		
 		float: left;
 		a {
@@ -279,8 +291,7 @@ aside {
 	nav {
 		position: relative;
 		left: -@asideWidth;
-		
-		
+
 		&.enabled {
 			left: 0;
 		}
@@ -340,7 +351,11 @@ aside {
 				white-space: nowrap;
 				margin-left: 50px;
 				margin-right: -50px;
-				position: relative;
+				position: relative;				
+				@media (min-width : @minTabletMode)  {
+					background-color: transparent !important;	
+				}
+				
 			}
 
 			&.active {
@@ -349,17 +364,37 @@ aside {
 					border-left: 0px none transparent;
 				}				
 			}	
-			&[data-slug="web-design"].active:after		  { background-color: #1d7e5b;outline:1px solid #1d7e5b; }
-			&[data-slug="web-design"]:before 	  { background-position: -0px -57px; }
 
-			&[data-slug="frontend-developement"].active:after { background-color: #3498b3;outline:1px solid #3498b3; }	
-			&[data-slug="frontend-developement"]:before{ background-position: -50px -57px; }
+			@web-design-color				: #d38d19;
+			@frontend-developement-color	: #3498bd;
+			@showreel-color					: #d0006c;
+			@about-color					: #228961;
 
-			&[data-slug="showreel"].active:after { background-color: #d0006c;outline:1px solid #d0006c; }	
-			&[data-slug="showreel"]:before{ background-position: -100px -57px; }
 
-			&[data-slug="about"].active:after { background-color: #d07a00;outline:1px solid #d07a00; }	
-			&[data-slug="about"]:before{ background-position: -150px -57px; }	
+			&[data-slug="web-design"]  {				
+				&.active:after		  	{ background-color: @web-design-color;outline:1px solid @web-design-color; }
+				&>span		  			{ background-color: @web-design-color; }
+				&:before 	  			{ background-position: -0px -57px; }
+			}
+
+			&[data-slug="frontend-developement"]  {
+				&.active:after 			{ background-color: @frontend-developement-color;outline:1px solid @frontend-developement-color; }	
+				&>span		  			{ background-color: @frontend-developement-color; }
+				&:before 				{ background-position: -50px -57px; }	
+			}
+
+			&[data-slug="showreel"]  {
+				&.active:after 			{ background-color: @showreel-color;outline:1px solid @showreel-color; }
+				&>span		  			{ background-color: @showreel-color; }
+				&:before 				{ background-position: -100px -57px; }
+			}
+
+			&[data-slug="about"]  {
+				&.active:after 			{ background-color: @about-color;outline:1px solid @about-color; }
+				&>span		  			{ background-color: @about-color; }	
+				&:before 				{ background-position: -150px -57px; }	
+			}
+			
 		}
 	}
 }
@@ -372,8 +407,8 @@ aside {
 		background-image: @sprite;
 		display: block;	
 		text-decoration: none;
-		width: 44px;
-		height: 44px;
+		width: 50px;
+		height: 50px;
 		opacity: 0.5;
 
 		&.active {			
@@ -385,17 +420,17 @@ aside {
 		}
 	}
 	#tileMode {
-		background-position: -71px -476px;			
+		background-position: -67px -471px;			
 	}
 	#blogMode {
-		background-position: -22px -476px;
+		background-position: -19px -471px;
 	}
 }
 #galleries-container {		
 	.box-sizing;
 	top:0;
 	left: @asideWidth;
-	right: 44px;
+	right: 50px;
 	position: absolute;
 	margin-top: 0;	
 
@@ -428,7 +463,8 @@ aside {
 	}
 
 	/****************** LAYOUT MODES ******************/
-	&.blogMode {
+
+	.blog-mode {
 		@posterWidth : 271px;
 		@elementHeight : 185px;
 		.element {
@@ -496,44 +532,39 @@ aside {
 			}
 		}
 	}	
-	&.tileMode {
+	.tile-mode {
 		@posterWidth : 271px;
-		@elementHeight : 280px;
+		@elementHeight : 257px;
 		.element {			
 			float: left;	
 			.transition(outline,0.5s);	
 			outline:0px solid #828282;	
+
 			&.active {
 
 				&:hover {
-				outline:8px solid #4b4b4b;					
-					&>div {
-
-						margin-top: 0;
-						&>h2 {
-							font-size: 14px;
-							padding-top: 15px;
-							padding-bottom: 7px;
-							height: 25px;
-						}
-						&>p {
-						}
+					outline:8px solid #4b4b4b;					
+					&>div>h2:before {
+						opacity: 1; 
+						background-size: 47px 47px;
 					}									
 				}
 
-				.box-sizing;
-
+				.box-sizing;				
 				width: @posterWidth;
 				height: @elementHeight;	
-				
+				background-color:white;
 				opacity: 1;
-				margin: 18px;
+				margin: 11px;
 				overflow: hidden;
+				background-position:0 72px;
 
 				&>div {
-					.transition(margin,1s);	
-					margin-top: 185px;
-					min-height: @elementHeight;						
+					
+					
+					height: 72px;						
+					overflow: hidden;
+
 					font-size: 12px;
 					&>h2, &>p {
 						padding: 0 40px;
@@ -542,8 +573,25 @@ aside {
 					&>h2 {
 						padding-top: 30px;
 						padding-bottom: 20px;
-						font-size: 20px;
+						font-size: 16px;
 						height: 50px;
+
+						&:before {
+							content:"";
+							background-image:url("../img/plus.png");
+							background-position: center center ;
+							background-size: 97px 97px;
+							background-color: rgba(0,0,0,0.6); 
+							background-repeat: no-repeat;
+							position: absolute;
+							margin-left: -40px;
+							display: block;						
+							width: @posterWidth;
+							height: @elementHeight;
+							margin-top:-30px;
+							.transition(all,1s);
+							opacity: 0;
+						}
 					}
 				}
 			}
@@ -552,6 +600,19 @@ aside {
 			opacity: 0;
 		}
 	}
+	&.blogMode  {
+
+		@media (min-width :@minTabletMode)  {
+			.blog-mode;	
+		}
+		@media (max-width : @maxTabletMode)  {
+			.tile-mode;	
+		}
+		
+	}
+	&.tileMode  {
+		.tile-mode;
+	}	
 	
 }
 #project-container {
@@ -794,6 +855,7 @@ aside {
 						background-repeat: no-repeat;
 						display: inline-block;
 						margin: 25px auto 0 auto;
+
 					}
 					&#behance span {
 						background-position: 0 -337px;
@@ -818,4 +880,59 @@ aside {
 
 #template.project {
 	display: none;
+}
+
+
+/*********** TABLET MODE *********************/
+
+@media (max-width : @maxTabletMode)  {
+	#super-container  {
+		header  {
+			display: block;
+		}
+		aside  {
+			width: 102px;	
+		 	.mainTitle  {
+				display: none;
+			}
+			nav  {
+				a:hover  {
+					width:auto;
+					span  {
+						display:block;
+						opacity: 1;
+						visibility: visible;
+						
+					}
+				}
+				a>span  {
+					visibility: hidden;
+					overflow: hidden;
+					opacity: 0;
+					.transition(opacity,0.5s);
+					padding-right: 20px;
+					padding-right: 25px;
+					position: absolute;
+					margin-left: 101px;
+				}
+			}
+		}
+		#galleries-container  {
+			left: 102px;
+			right: 0;
+			top: 82px;
+		}
+		#layouts  {
+			display: none;
+		}
+	}
+}
+@media (max-width : 600px)  {
+	#project-container  {
+		.project  {
+			.side  {
+				display: none;
+			}
+		}
+	}
 }
