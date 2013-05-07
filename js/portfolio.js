@@ -293,8 +293,9 @@ $(document).ready( function() {
                                         + getID + " style='background-image:url("+bgURL+")'"
                                         + " data-album='" + getAlbum 
                                         + "' data-slug=" + getSlug+">" 
-                                        + "<div><h2>"+getName+"</h2>" +
-                                            "<p>"+getDesc+"</p></div>" +
+                                        + "<div><h2>"+getName+"</h2>" 
+                                        + "<img class='poster' src='"+bgURL+"' style='display:none'>"
+                                        + "<p>"+getDesc+"</p></div>" +
                                         "</div>";
                                         
                             $container.append($nav_el);

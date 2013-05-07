@@ -249,6 +249,9 @@ header  {
 	.mainTitle  {		
 		background-position: 102px -532px;
 	}
+	#nav-toggler {
+		display: none;
+	}
 }
 aside {	
 	p.links {		
@@ -347,6 +350,7 @@ aside {
 				display: inline-block;
 				float: left;
 				height: 50px;
+				width: 240px;
 				overflow: hidden;
 				white-space: nowrap;
 				margin-left: 50px;
@@ -577,20 +581,22 @@ aside {
 						height: 50px;
 
 						&:before {
-							content:"";
-							background-image:url("../img/plus.png");
-							background-position: center center ;
-							background-size: 97px 97px;
-							background-color: rgba(0,0,0,0.6); 
-							background-repeat: no-repeat;
-							position: absolute;
-							margin-left: -40px;
-							display: block;						
-							width: @posterWidth;
-							height: @elementHeight;
-							margin-top:-30px;
-							.transition(all,1s);
-							opacity: 0;
+							@media (min-width : 380px) {							
+								content:"";
+								background-image:url("../img/plus.png");
+								background-position: center center ;
+								background-size: 97px 97px;
+								background-color: rgba(0,0,0,0.6); 
+								background-repeat: no-repeat;
+								position: absolute;
+								margin-left: -40px;
+								display: block;						
+								width: @posterWidth;
+								height: @elementHeight;
+								margin-top:-30px;
+								.transition(all,1s);
+								opacity: 0;
+							}
 						}
 					}
 				}
@@ -889,6 +895,10 @@ aside {
 	#super-container  {
 		header  {
 			display: block;
+			.mainTitle {
+				width: 100%;
+				overflow: hidden;
+			}
 		}
 		aside  {
 			width: 102px;	
@@ -927,12 +937,103 @@ aside {
 		}
 	}
 }
-@media (max-width : 600px)  {
+@media (max-width : 1000px)  {
+	body {
+		overflow: visible !important;
+	}
 	#project-container  {
-		.project  {
+			max-width: 725px;
+			margin:0 auto;
 			.side  {
+			
 				display: none;
 			}
+			.project .body .content {
+				width: 100%;
+				text-align: center;
+				padding: 50px 0;
+			}
+		
+	}
+}
+@media (max-width : 790px) {
+	#super-container {	
+		#project-container {
+		
+				.nav.left , .nav.right {
+					display: none;
+				}
+		}
+	}		
+}
+@media (max-width : 380px) {
+	#super-container  {
+		
+		header {
+			#nav-toggler {
+				display: block;
+			}
+			.mainTitle {
+				background-position: -5px -532px;
+			}
+		}
+		aside nav {
+			display: none;
+		}
+		#project-container {
+			
+			.project {
+				h2 {
+					margin-top: 25px;
+					margin-left: 20px;
+					font-size: 25px;
+				}
+				.gallery-description {
+					width: auto;
+					margin: 0 20px;
+				}
+			}
+		}
+		#galleries-container {
+
+			* {
+				position: static;
+				float: none;
+			}				
+			
+			left: 0;			
+			
+			.element {
+				display: none;
+				&.active {
+					display: block;
+				}
+				width: 100%;
+				height: auto;
+				margin:15px 0;
+				background-image: none !important;
+				&>div {
+					height: auto;
+					overflow: visible;
+					img.poster {
+						display: block !important;
+						width: 100%;
+						height: auto;
+					}
+					&>h2 {
+						padding-left: 0;
+						padding-right: 0;
+						text-indent: 25px;
+						height: auto;
+					}
+					&>p {
+						display: none;
+					}
+			
+				}
+			}
+
+			
 		}
 	}
 }
