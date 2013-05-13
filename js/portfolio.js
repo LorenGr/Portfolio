@@ -173,7 +173,8 @@ $(document).ready( function() {
                     e.preventDefault();
                     Portfolio.route.pushThis("about");
                 });
-                $(".goTop").click(function() {
+                $(".goTop").click(function(e) {
+                    e.preventDefault();
                     Portfolio.template.resize.scrollTop();
                 });
                 //Launch galleries using default filtering
@@ -281,15 +282,12 @@ $(document).ready( function() {
                             getSlug  = $gallery[i].slug;     
                             getDesc  = $gallery[i].galdesc;
                             getThumb = $gallery[i].filename;
-                            bgURL    = Portfolio.CONFIG.site_domain
-                                     +Portfolio.CONFIG.site_root
-                                     +Portfolio.CONFIG.gallery_images_path
-                                     +getSlug
-                                     +"/"+getThumb;
+                            getRoot  = Portfolio.CONFIG.site_domain + Portfolio.CONFIG.site_root;
+                            bgURL    = getRoot + Portfolio.CONFIG.gallery_images_path + getSlug + "/" + getThumb;
 
                             //Create Gallery Items
                             $nav_el = '';
-                            $nav_el =  "<div class='element gallery-holder " + getAlbum + "' id=" 
+                            $nav_el =  "<a href='"+Portfolio.route.createUrl(getSlug,getAlbum)+"' class='element gallery-holder " + getAlbum + "' id=" 
                                         + getID + " style='background-image:url("+bgURL+")'"
                                         + " data-album='" + getAlbum 
                                         + "' data-slug=" + getSlug+">" 
@@ -302,7 +300,8 @@ $(document).ready( function() {
 
                         });
                     }
-                    $container.find(".gallery-holder").click( function() {  
+                    $container.find(".gallery-holder").click( function(e) {  
+                        e.preventDefault();
                         Portfolio.CONFIG.active_album_title      = $(this).data("album");   
                         Portfolio.navigation.gallery.setActive($(this).data("slug"));                   
                         Portfolio.route.pushUrl();              
@@ -362,15 +361,18 @@ $(document).ready( function() {
                         Portfolio.route.pushUrl();                      
                     });
 
-                    Portfolio.UI.projectTemplate.find(".closer").click(function() {
+                    Portfolio.UI.projectTemplate.find(".closer").click(function(e) {
+                        e.preventDefault();
                         Portfolio.navigation.home();                    
                     }); 
 
-                    Portfolio.UI.projectContainer.find(".right.nav").click(function() {
-                    	Portfolio.UI.projects.children(":first").find(".side a.active").next().trigger("click");	
+                    Portfolio.UI.projectContainer.find(".right.nav").click(function(e) {
+                    	e.preventDefault();
+                        Portfolio.UI.projects.children(":first").find(".side a.active").next().trigger("click");	
                     }); 
-                    Portfolio.UI.projectContainer.find(".left.nav").click(function() {
-                    	Portfolio.UI.projects.children(":first").find(".side a.active").prev().trigger("click");	
+                    Portfolio.UI.projectContainer.find(".left.nav").click(function(e) {
+                    	e.preventDefault();
+                        Portfolio.UI.projects.children(":first").find(".side a.active").prev().trigger("click");	
                     });
 
                     $(document).keyup(function(e) {
@@ -458,12 +460,12 @@ $(document).ready( function() {
                         getAlbum = $gallery[i].album;
                         getID    = $gallery[i].gid; 
                         getSlug  = $gallery[i].slug; 
-                        Portfolio.UI.projectTemplate.find(".side").append("<a href='#' id='"+ getID
+                        Portfolio.UI.projectTemplate.find(".side").append("<a href='"+Portfolio.route.createUrl(getSlug,getAlbum)+"' id='"+ getID
                             +"' data-album='"+getAlbum
 							+"' data-slug='"+getSlug
-                            +"' >"+ getName+"</a>");                  
+                            +"' >"+ getName+"</a>");          
                     }); 
-                    Portfolio.navigation.project.init(); //attach handlers of left/right arrows and
+                    Portfolio.navigation.project.init(); //Attach handlers of left/right arrows and
                 },
                 create : function(pictures,slug) {
                     var $html = "", 
@@ -549,7 +551,8 @@ $(document).ready( function() {
             },
             showreel : {  //template
                 init : function() {
-                    Portfolio.UI.showreel.find(".closer").click(function(){
+                    Portfolio.UI.showreel.find(".closer").click(function(e){
+                        e.preventDefault();
                         Portfolio.navigation.home();
                     });                         
                     //Load video through youtube api
@@ -607,7 +610,8 @@ $(document).ready( function() {
             },
             about : {  //template
                 init : function() {                    
-                     Portfolio.UI.about.find(".closer").click(function(){
+                     Portfolio.UI.about.find(".closer").click(function(e){
+                        e.preventDefault();
                         Portfolio.navigation.home(); 
                     }); 
                 },
@@ -655,19 +659,24 @@ $(document).ready( function() {
                 });
             },
             pushThis : function(pushIt) {
-                Portfolio.GLOBAL.History.pushState(null, null, '/'+Portfolio.CONFIG.site_root+pushIt);
+                Portfolio.GLOBAL.History.pushState(null, null, '/' + Portfolio.CONFIG.site_root + pushIt);
             },
-            pushUrl: function() {
+            createUrl : function(getSlug,getAlbum) {
                 var friendly_gallery = "", friendly_album = "",friendly_gallery_slug = "";
-                if (Portfolio.CONFIG.active_gallery != "") {
-                    friendly_gallery_slug = Portfolio.UI.galleries.find(".gallery-holder#"+Portfolio.CONFIG.active_gallery).data("slug");
-                    friendly_album = Portfolio.CONFIG.active_album_title;
+
+                if (Portfolio.CONFIG.active_gallery != "" || getSlug != null || getAlbum != null  ) {
+                    friendly_gallery_slug = getSlug || Portfolio.UI.galleries.find(".gallery-holder#" + Portfolio.CONFIG.active_gallery).data("slug");
+                    friendly_album = getAlbum || Portfolio.CONFIG.active_album_title;
                     friendly_gallery = "/"+friendly_gallery_slug;
-                }                
-                Portfolio.GLOBAL.History.pushState(null, null, '/'+Portfolio.CONFIG.site_root+friendly_album+friendly_gallery);
+                }
+                
+                return Portfolio.CONFIG.site_root + friendly_album + friendly_gallery;
+            },
+            pushUrl: function() {                                  
+                Portfolio.GLOBAL.History.pushState(null, null, '/'+ Portfolio.route.createUrl());
             },
             go: function() {                    
-                
+                //Function that handles url changes
                 url = window.location.href;
                 var getSlugs = url.substr((Portfolio.CONFIG.site_domain+Portfolio.CONFIG.site_root).length,url.length);
 

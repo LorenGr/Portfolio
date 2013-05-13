@@ -110,6 +110,8 @@ html { -webkit-font-smoothing: antialiased; }
 	border-bottom: 1px solid #a1a1a1;
 }
 .closerButton {
+	text-decoration: none;
+	display: block;
 	width: 80px;
 	height: 50px;
 	background-image: @sprite;
@@ -203,6 +205,7 @@ body {
 	display: none;
 }
 .goTop {
+	text-decoration: none;
 	.transition(all,1s);
 	&.enable {
 		visibility: visible;
@@ -441,8 +444,7 @@ aside {
 	#galleries {
 		height: 100%;
 		overflow: hidden;
-		.element {			
-					
+		.element {						
 			cursor: pointer;
 			background-repeat: no-repeat;
 			&>div {
@@ -456,11 +458,7 @@ aside {
 					text-transform: uppercase;				
 					color: #3b3b3b;
 					display: block;					
-					vertical-align: middle;
-					&:before {
-							
-					}
-					
+					vertical-align: middle;					
 				}
 			}
 		}
@@ -472,7 +470,9 @@ aside {
 		@posterWidth : 271px;
 		@elementHeight : 185px;
 		.element {
-			overflow: hidden;				
+			overflow: hidden;
+			text-decoration: none;
+			display: block;				
 			&.active {
 				height: @elementHeight;	
 				opacity: 1;
@@ -489,15 +489,12 @@ aside {
 				&>div>h2:before{ 
 					opacity: 1; 
 					background-size: 47px 47px;
-				}				
-					
+				}					
 			}
-			width: 100%;
-						
+			width: 100%;						
 			background-position: center left;
 			background-size: @posterWidth auto;				
-			margin: 0;
-			
+			margin: 0;			
 			&>div {
 				border-bottom: 1px solid #bec3c7;
 				position: relative;
@@ -635,6 +632,8 @@ aside {
 	margin: 30px auto 0 auto; 
 
 	.left , .right {
+		display: block;
+		text-decoration: none;
 		width: 50px;
 		position: fixed;
 		top: 0;
