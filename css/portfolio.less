@@ -447,6 +447,7 @@ aside {
 		height: 100%;
 		overflow: hidden;
 		.element {						
+			text-decoration: none;
 			cursor: pointer;
 			background-repeat: no-repeat;
 			&>div {
@@ -957,6 +958,8 @@ aside {
 		
 	}
 }
+
+/*********** SMALL TABLET MODE *********************/
 @media (max-width : 790px) {
 	#super-container {	
 		#project-container {
@@ -967,7 +970,12 @@ aside {
 		}
 	}		
 }
+
+/*********** MOBILE MODE *********************/
 @media (max-width : 380px) {
+	.goTop  {
+		display: none;
+	}
 	#super-container  {
 		
 		header {
@@ -987,7 +995,8 @@ aside {
 				h2 {
 					margin-top: 25px;
 					margin-left: 20px;
-					font-size: 25px;
+					font-size: 20px;
+					width: auto;
 				}
 				.gallery-description {
 					width: auto;

@@ -9,19 +9,20 @@ $(document).ready( function() {
         //Initial launching sequence
         init : function(mode,callback) {
             Portfolio.getdata.init( function() {
-                Portfolio.getdata.albums();                     
-                Portfolio.getdata.galleries( function() {           
-                    Portfolio.template.resize.albums();
-                    Portfolio.navigation.album.show();
-                    Portfolio.template.showreel.init();
-                    Portfolio.template.blackScreen.init();
-                    Portfolio.route.init();
-                    Portfolio.template.init();
-                    Portfolio.navigation.init(mode);
-                    if(typeof callback == 'function'){
-                        callback.call(this);
-                    }
-                });                 
+                Portfolio.getdata.albums(); // create array
+                Portfolio.getdata.galleries(); // create array
+                Portfolio.navigation.gallery.preload(); //preload images before proceeding
+                Portfolio.navigation.gallery.create(); // create dom elements
+                Portfolio.template.resize.albums(); // page centering functions
+                Portfolio.navigation.album.show();
+                Portfolio.template.showreel.init();
+                Portfolio.template.blackScreen.init();
+                Portfolio.route.init();
+                Portfolio.template.init();
+                Portfolio.navigation.init(mode);
+                if(typeof callback == 'function'){
+                    callback.call(this);
+                }
             });
         },
         // Locate and assign Interface Elements to objects
@@ -88,11 +89,11 @@ $(document).ready( function() {
                         Portfolio.DATASOURCES.pictures = jsonData.pictures;
 
                         if(typeof callback == 'function'){
-                        callback.call(this);
-                    }
+                            callback.call(this);
+                        }
                     },
                     error: function (xhr, ajaxOptions, thrownError) {
-                        console.log("**ALERT** AJAX ERROR "+xhr.status + " : " + thrownError);
+                        console.log("**ALERT** AJAX ERROR " + xhr.status + " : " + thrownError);
                     }
                 });         
             },
@@ -100,7 +101,7 @@ $(document).ready( function() {
                 $albums = Portfolio.DATASOURCES.albums;
                 Portfolio.navigation.album.create($albums);             
             },      
-            galleries : function(callback) {  //getdata
+            galleries : function() {  //getdata
                 $galleries = Portfolio.DATASOURCES.galleries;
                 $gallery   = $galleries.Galleries;  
                 
@@ -129,11 +130,7 @@ $(document).ready( function() {
                     //merge all albums in 1 big array
                     $.merge(Portfolio.DATASOURCES.allGalleries,arr);
                 });
-                Portfolio.navigation.gallery.create( function() {
-                    if(typeof callback == 'function'){
-                        callback.call(this);
-                    }
-                });
+                
             },
             pictures : function(gid) {  //getdata
                 console.log("getting pictures data:"+gid);
@@ -263,6 +260,20 @@ $(document).ready( function() {
             		Portfolio.UI.root.find("#layouts a").removeClass("active");
                     Portfolio.UI.root.find("#layouts a#"+getMode).addClass("active");
                 },
+                preload : function()  {
+                    var bgURL;
+                    for(x=0;x<$gallery.length;x++)  {
+                        getRoot  = Portfolio.CONFIG.site_domain + Portfolio.CONFIG.site_root;
+                        getThumb = $gallery[x].filename;
+                        getSlug  = $gallery[x].slug;
+                        imgURL    = getRoot + Portfolio.CONFIG.gallery_images_path + getSlug + "/" + getThumb;
+                        
+                        $("<img src='"+imgURL+"'>").load(function() {
+                            console.lkog("loaded:"+ $(this).attr("src"));    
+                                
+                        });
+                    }
+                },
                 create : function(callback) {
                     var $html      = "",    
                         $gallery   = Portfolio.DATASOURCES.allGalleries,
@@ -272,7 +283,7 @@ $(document).ready( function() {
                         $scrollPos = 0;
 
                     $container.empty();
-                    
+
                     if($gallery.length > 0) {
                         $.each($gallery, function(i,v) {
 
@@ -295,9 +306,7 @@ $(document).ready( function() {
                                         + "<img class='poster' src='"+bgURL+"' style='display:none'>"
                                         + "<p>"+getDesc+"</p></div>" +
                                         "</div>";
-                                        
                             $container.append($nav_el);
-
                         });
                     }
                     $container.find(".gallery-holder").click( function(e) {  
@@ -307,7 +316,7 @@ $(document).ready( function() {
                         Portfolio.route.pushUrl();              
                     });
                     $galleriesContainer.addClass($galleryMode);
-                                    
+
                     //Call gallery layout mode template
                     Portfolio.navigation.gallery.initTogglers();
                     Portfolio.template.gallery[$galleryMode]();
