@@ -138,7 +138,8 @@ html { -webkit-font-smoothing: antialiased; }
 #project-container .closer		{ z-index: 460; }
 #project-container .side		{ z-index: 450; }
 #project-container .body 		{ z-index: 440; }
-.blackScreen					{ z-index: 430; }
+.blackScreen,
+.preloader						{ z-index: 430; }
 #layouts						{ z-index: 425; }
 header 							{ z-index: 420; }
 aside 							{ z-index: 400; }
@@ -183,6 +184,11 @@ body {
 	&.enable {
 		left: 0;
 	}
+	&.state-loading {
+		aside , #layouts {
+			display: none;
+		}
+	}
 }
 .gitIcon {
 	width: 27px;
@@ -196,13 +202,25 @@ body {
 	}
 	vertical-align:middle;
 }
-.blackScreen {
+.blackScreen , .preloader {
 	position: fixed;
 	width: 100%;
 	height: 100%;
 	background-color: rgba(0,0,0,0.8);	
 	cursor: pointer;
 	display: none;
+}
+#preloader {
+	display: block;
+	#bar {
+		height: 50px;
+		position: absolute;
+		top: 0px;
+		left: 0;
+		width: 0;
+		background-color: orange;
+		display: block;
+	}
 }
 .goTop {
 	text-decoration: none;
