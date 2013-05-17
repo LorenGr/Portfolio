@@ -49,8 +49,8 @@ $(document).ready( function() {
         //Central configuration variables for app
         CONFIG : {
             //URL CONF
-            // "site_domain"           : "http://"+window.top.location.hostname, //IPHONE is giving problems with this 
-            "site_domain"           : "http://www.lorengrixti.com",               
+             "site_domain"           : "http://"+window.top.location.hostname, //IPHONE is giving problems with this 
+            //"site_domain"           : "http://lorengrixti.com",               
             "site_root"             : "/",
 
             "first_time"            : true, //if first time loading site (for rewriting)
@@ -296,7 +296,7 @@ $(document).ready( function() {
                     } else {
                         Portfolio.navigation.gallery.preloadImage(getIndex,callback); //pass callback back and forth until loading is done             
                     }
-                },                
+                },
                 preloadImage : function(x,callback) {                    
                 var galleries       = Portfolio.DATASOURCES.galleries,
                     $gallery        = $galleries.Galleries,
@@ -628,14 +628,20 @@ $(document).ready( function() {
                 },
                 ready : function(event) {
                     //Video is now ready to be used
-                },
-                pause : function(event) {
+                    Portfolio.template.showreel.pause = function(event)  {
                         Portfolio.CONFIG.player.stopVideo();
-                },
-                play : function(event) {
-                        if(Portfolio.CONFIG.playerLoaded)  {
+                    }
+                    Portfolio.template.showreel.play = function(event)  {
+                         if(Portfolio.CONFIG.playerLoaded)  {
                             Portfolio.CONFIG.player.playVideo();
                         }
+                    }
+                },
+                pause : function(event) {
+                        
+                },
+                play : function(event) {
+                       
                 },
                 create : function() {
                     Portfolio.template.showreel.open(); 
