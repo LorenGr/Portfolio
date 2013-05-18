@@ -49,8 +49,8 @@ $(document).ready( function() {
         //Central configuration variables for app
         CONFIG : {
             //URL CONF
-            // "site_domain"           : "http://"+window.top.location.hostname, //IPHONE is giving problems with this 
-            "site_domain"           : "http://www.lorengrixti.com",               
+             "site_domain"           : "http://"+window.top.location.hostname, //IPHONE is giving problems with this 
+            //"site_domain"           : "http://www.lorengrixti.com",               
             "site_root"             : "/",
 
             "first_time"            : true, //if first time loading site (for rewriting)

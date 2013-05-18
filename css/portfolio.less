@@ -991,6 +991,9 @@ aside {
 
 /*********** MOBILE MODE *********************/
 @media (max-width : 380px) {
+	* {
+		position: static !important;
+	}
 	.goTop  {
 		display: none;
 	}
@@ -1028,6 +1031,10 @@ aside {
 				position: static;
 				float: none;
 			}				
+			#galleries {
+				height: auto;
+				overflow: visible;
+			}
 			
 			left: 0;			
 			
