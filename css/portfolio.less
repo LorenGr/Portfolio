@@ -158,10 +158,10 @@ body {
 	font-family: 'Custom-Bold';
 	color: white;
 
-	overflow-x: hidden;
-	overflow-y: visible;
-
-
+	@media (min-width : 381px) {
+		overflow-x: hidden;
+		overflow-y: visible;	
+	}
 	/*SITE LAUNCH INTERFACE ANIMATION*/
 	&.intro aside nav {
 		.transition(left,0.6s);
@@ -991,14 +991,18 @@ aside {
 
 /*********** MOBILE MODE *********************/
 @media (max-width : 380px) {
-	* {
+	body , html {		
+		-webkit-overflow-scrolling: touch;		
+	}	
+	div, p, span , a {
 		position: static !important;
+		float: none !important;
 	}
 	.goTop  {
 		display: none;
 	}
 	#super-container  {
-		
+
 		header {
 			#nav-toggler {
 				display: block;
@@ -1007,9 +1011,11 @@ aside {
 				background-position: -5px -532px;
 			}
 		}
+	
 		aside {
 			display: none;
 		}
+	
 		#project-container {
 			
 			.project {
@@ -1027,10 +1033,6 @@ aside {
 		}
 		#galleries-container {
 
-			* {
-				position: static;
-				float: none;
-			}				
 			#galleries {
 				height: auto;
 				overflow: visible;

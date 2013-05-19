@@ -3,26 +3,35 @@
 //Author : Loren Grixti //
 //////////////////////////
 
-$(document).ready( function() {
+(function(window,undefined){
 
     Portfolio = {
         //Initial launching sequence
-        init : function(callback) {
+        init : function(callback) {            
             Portfolio.template.init(); //these elements can start whether data has been loaded or not
             Portfolio.getData.init( function() { //the below needs data to start
                 Portfolio.getData.albums(); // create array
                 Portfolio.getData.galleries(); // create array
                 Portfolio.template.start(); 
+                
                 Portfolio.navigation.gallery.preload(0,function(){ //Preload the gallery images before building interface                    
                     if(typeof callback == 'function'){
                         callback.call(this);//this callback waits for ajax loading
                     }
-                });               
+                });                    
+                               
+               
             });
         },
         start : function() {
             Portfolio.route.init();            
             Portfolio.navigation.init();
+        },
+        support : function() {
+            //Browser support conditions
+            if( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent) ) {
+                Portfolio.CONFIG.isMobile = true;
+            }
         },
         // Locate and assign Interface Elements to objects
         UI: {
@@ -50,7 +59,7 @@ $(document).ready( function() {
         CONFIG : {
             //URL CONF
              "site_domain"           : "http://"+window.top.location.hostname, //IPHONE is giving problems with this 
-            //"site_domain"           : "http://www.lorengrixti.com",               
+            //"site_domain"           : "http://lorengrixti.com",               
             "site_root"             : "/",
 
             "first_time"            : true, //if first time loading site (for rewriting)
@@ -72,7 +81,8 @@ $(document).ready( function() {
             "player"                : "",
             "playerLoaded"          : false,
             "isInMotion"            : false,
-            "isDirectAccess"        : false
+            "isDirectAccess"        : false,
+            "isMobile"              : false
         },
         GLOBAL : {
             "History"           : window.History
@@ -88,6 +98,7 @@ $(document).ready( function() {
                         Portfolio.DATASOURCES.albums = jsonData.albums;
                         Portfolio.DATASOURCES.galleries = jsonData.galleries;
                         Portfolio.DATASOURCES.pictures = jsonData.pictures;
+
 
                         if(typeof callback == 'function'){
                             callback.call(this);//this callback waits for ajax loading
@@ -163,6 +174,7 @@ $(document).ready( function() {
         },  
         navigation : {
             init: function() {
+
                 Portfolio.navigation.gallery.create(); // create dom elements            
                 Portfolio.navigation.album.show(); 
 
@@ -186,7 +198,7 @@ $(document).ready( function() {
                 }); 
                	Portfolio.UI.nav.find("#about").click( function(e) {
                     e.preventDefault();
-                    Portfolio.route.pushThis("about");
+                    Portfolio.route.pushUrl("about");
                 });
                 $(".goTop").click(function(e) {
                     e.preventDefault();
@@ -225,7 +237,6 @@ $(document).ready( function() {
                         $html += $nav_el;
                     });
                     Portfolio.UI.nav.prepend($html);
-                    //over click test passed
                     Portfolio.UI.nav.find(".album-links").click( function(e){
                         e.preventDefault();
                         var setSlug = $(this).data("slug");
@@ -253,7 +264,7 @@ $(document).ready( function() {
                 },
                 launch : function(albumSlug) {
                     if(albumSlug=="showreel") {
-                        Portfolio.route.pushThis("showreel");
+                        Portfolio.route.pushUrl("showreel");
                     } else {
                         //set default filter if nothing passed. Particularly used in first time filtering               
                         Portfolio.navigation.album.activate(albumSlug || Portfolio.CONFIG.album_filters);
@@ -266,6 +277,7 @@ $(document).ready( function() {
             gallery : { //navigation
             	initTogglers : function() {
                     Portfolio.UI.root.find("#layouts a").click(function(e) {
+
                         e.preventDefault();                        
                         $newGalleryMode = $(this).attr("id");
                         Portfolio.navigation.gallery.setToggler($newGalleryMode);
@@ -296,7 +308,7 @@ $(document).ready( function() {
                     } else {
                         Portfolio.navigation.gallery.preloadImage(getIndex,callback); //pass callback back and forth until loading is done             
                     }
-                },                
+                },
                 preloadImage : function(x,callback) {                    
                 var galleries       = Portfolio.DATASOURCES.galleries,
                     $gallery        = $galleries.Galleries,
@@ -306,6 +318,9 @@ $(document).ready( function() {
                     imgURL          = getRoot + Portfolio.CONFIG.gallery_images_path + getSlug + "/" + getThumb;
 
                     $("<img src='"+imgURL+"'>").load( function() {                            
+                            Portfolio.navigation.gallery.preload(x+1,callback);                                                        
+                    });
+                    $("<img src='"+imgURL+"'>").error( function() {                            
                             Portfolio.navigation.gallery.preload(x+1,callback);                                                        
                     });
                 },
@@ -318,6 +333,8 @@ $(document).ready( function() {
                         $scrollPos = 0;
 
                     $container.empty();
+
+
 
                     if($gallery.length > 0) {
                         $.each($gallery, function(i,v) {
@@ -342,13 +359,16 @@ $(document).ready( function() {
                                         + "<p>"+getDesc+"</p></div>" +
                                         "</div>";
                             $container.append($nav_el);
+
                         });
                     }
                     $container.find(".gallery-holder").click( function(e) {  
+
                         e.preventDefault();
                         Portfolio.CONFIG.active_album_title      = $(this).data("album");   
                         Portfolio.navigation.gallery.setActive($(this).data("slug"));                   
                         Portfolio.route.pushUrl();              
+
                     });
                     $galleriesContainer.addClass($galleryMode);
 
@@ -628,14 +648,20 @@ $(document).ready( function() {
                 },
                 ready : function(event) {
                     //Video is now ready to be used
-                },
-                pause : function(event) {
+                    Portfolio.template.showreel.pause = function(event)  {
                         Portfolio.CONFIG.player.stopVideo();
-                },
-                play : function(event) {
-                        if(Portfolio.CONFIG.playerLoaded)  {
+                    }
+                    Portfolio.template.showreel.play = function(event)  {
+                         if(Portfolio.CONFIG.playerLoaded)  {
                             Portfolio.CONFIG.player.playVideo();
                         }
+                    }
+                },
+                pause : function(event) {
+                        
+                },
+                play : function(event) {
+                       
                 },
                 create : function() {
                     Portfolio.template.showreel.open(); 
@@ -721,13 +747,10 @@ $(document).ready( function() {
                 Portfolio.route.setChangeEvent();               
             },           
             setChangeEvent: function(){
-                Portfolio.GLOBAL.History.Adapter.bind(window,'statechange',function(){
+                $(window).bind('statechange',function(){
                     Portfolio.route.go();
                 });
-            },
-            pushThis : function(pushIt) {
-                Portfolio.GLOBAL.History.pushState(null, null, '/' + Portfolio.CONFIG.site_root + pushIt);
-            },
+            },            
             createUrl : function(getSlug,getAlbum) {
                 var friendly_gallery = "", friendly_album = "",friendly_gallery_slug = "";
 
@@ -735,19 +758,23 @@ $(document).ready( function() {
                     friendly_gallery_slug = getSlug || Portfolio.UI.galleries.find(".gallery-holder#" + Portfolio.CONFIG.active_gallery).data("slug");
                     friendly_album = getAlbum || Portfolio.CONFIG.active_album_title;
                     friendly_gallery = "/"+friendly_gallery_slug;
-                }
-                
+                }                
                 return Portfolio.CONFIG.site_root + friendly_album + friendly_gallery;
             },
-            pushUrl: function() {                                  
-                Portfolio.GLOBAL.History.pushState(null, null, '/'+ Portfolio.route.createUrl());
+            pushUrl: function(pushIt) {                                  
+                var setURL;
+                if(pushIt == null || pushIt == undefined) {
+                    setURL = Portfolio.route.createUrl();                   
+                } else {
+                   setURL = Portfolio.CONFIG.site_root + pushIt;
+                }
+                Portfolio.GLOBAL.History.pushState(null, null, '/'+ setURL);                                      
             },
-            go: function() {                    
+            go: function() {     
                 //Function that handles url changes
                 url = window.location.href;
                 var getSlugs = url.substr((Portfolio.CONFIG.site_domain+Portfolio.CONFIG.site_root).length,url.length);
-
-                var slugs = getSlugs.split('/');    
+                var slugs = getSlugs.split('/');                    
                 console.log("GOING TO : "+getSlugs);
                 
                 //URL REWRITING POSSIBLE VALUES
@@ -775,6 +802,7 @@ $(document).ready( function() {
                     case "": //HOME
                         if(Portfolio.CONFIG.first_time) { //if first time accessed through home
                             Portfolio.CONFIG.isDirectAccess = false;
+                        
                             Portfolio.init();                    
                         } else {
                             Portfolio.template.closepopin();
@@ -889,8 +917,10 @@ $(document).ready( function() {
             }
         }
     };
+    Portfolio.support();
     Portfolio.route.go();
-});
+
+})(window);
  
 function onYouTubeIframeAPIReady() {
     Portfolio.template.showreel.loaded();   
