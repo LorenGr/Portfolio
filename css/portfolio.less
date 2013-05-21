@@ -996,10 +996,22 @@ aside {
 			
 				display: none;
 			}
-			.project .body .content {
-				width: 100%;
-				text-align: center;
-				padding: 50px 0;
+			.project {
+				.body .content {
+					width: 100%;
+					text-align: center;
+					padding: 50px 0;
+				}
+				.body h2 {
+					padding-top: 25px;
+					margin: 0 0 0 40px;
+					
+					width: auto;
+				}
+				.body .gallery-description {
+					width: auto;
+					margin: 0 40px 20px 40px;
+				}
 			}
 		
 	}
@@ -1221,17 +1233,14 @@ aside {
 						height: 75px;
 						background-position: 0 -118px;
 					}
-				}
-				h2 {
-					padding-top: 25px;
+				}			
+				.body h2 {					
 					margin: 0 0 0 20px;
-					font-size: 20px;
-					width: auto;
+					font-size: 20px;					
 				}
-				.gallery-description {
-					width: auto;
+				.body .gallery-description {					
 					margin: 0 20px 20px 20px;
-				}
+				}			
 			}
 		}
 		#galleries-container {
