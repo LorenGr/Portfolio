@@ -266,9 +266,10 @@
                     Portfolio.CONFIG.album_filters = "."+slug;
                 },
                 setActive : function(slug)  {
+                    slug = slug.replace("#",""); //done for IE8 hash
                     var $getObj = Portfolio.UI.nav.find(".album-links[data-slug='"+slug+"']");
                     Portfolio.CONFIG.active_album       = $getObj.attr("id");
-                    Portfolio.CONFIG.active_album_slug  = $getObj.data("slug");
+                    Portfolio.CONFIG.active_album_slug  = $getObj.data("slug");                    
                     Portfolio.CONFIG.active_album_title = $getObj.text();
                 },
                 launch : function(albumSlug) {
@@ -362,7 +363,7 @@
                                         + "<div><h2>"+getName+"</h2>" 
                                         + "<img class='poster' src='"+bgURL+"' style='display:none'>"
                                         + "<p>"+getDesc+"</p></div>" +
-                                        "</div>";
+                                        "</a>";
                             $container.append($nav_el);
 
                         });
@@ -426,7 +427,19 @@
                         e.preventDefault();
                         Portfolio.CONFIG.active_album_title = $(this).data("album");    
                         Portfolio.navigation.gallery.setActive($(this).data("slug"));
-                        Portfolio.route.pushUrl();                      
+                        Portfolio.route.pushUrl();
+
+                        //show or hide left/right depending on extremities
+                        if($(this).index()==1) {
+                            Portfolio.UI.projectContainer.find(".left.nav").hide();
+                        } else {
+                            Portfolio.UI.projectContainer.find(".left.nav").show();
+                        }                        
+                        if($(this).is(':last-child')) {
+                            Portfolio.UI.projectContainer.find(".right.nav").hide();
+                        } else {
+                            Portfolio.UI.projectContainer.find(".right.nav").show();
+                        }                     
                     });
 
                     Portfolio.UI.projectTemplate.find(".closer").click(function(e) {
@@ -535,8 +548,9 @@
                         Portfolio.UI.projectTemplate.find(".side").append("<a href='"+Portfolio.route.createUrl(getSlug,getAlbum)+"' id='"+ getID
                             +"' data-album='"+getAlbum
 							+"' data-slug='"+getSlug
-                            +"' >"+ getName+"</a>");          
+                            +"' >"+ getName+"</a>");                        
                     }); 
+
                     Portfolio.navigation.project.init(); //Attach handlers of left/right arrows and
                 },
                 create : function(pictures,slug) {
@@ -551,9 +565,18 @@
                         getSlug = slug;
                     
                     $newProject.attr("id","");
-                    $projectSide.find("a").not("[data-album='"+Portfolio.CONFIG.active_album_slug+"']").remove();
+                    
+                    $.each($projectSide.find("a"), function(i,v) {                        
+                        if( $(this).data("album") !=  Portfolio.CONFIG.active_album_slug ) {                            
+                            $(this).remove();                            
+                        }
+                    });     
+                    
+                    //$projectSide.find("a").not("[data-album='"+Portfolio.CONFIG.active_album_slug+"']").remove();
+                    
                     $projectTitle.html(Portfolio.CONFIG.active_gallery_title);
                     //Retrieve main desctription of gallery and add it under first image         
+                    
                     $projectDescription.html(Portfolio.navigation.gallery.getActive().find("p").text());
                     
                     $filePath = Portfolio.CONFIG.site_domain + Portfolio.CONFIG.site_root + Portfolio.CONFIG.gallery_images_path;
@@ -580,7 +603,7 @@
                     $projectBody.append($html);
                     $projectBody.css("background-image","url("+$filePath+getSlug+ "/bg.jpg)");
                     $projectBody.parent().css("padding-left","50px").animate({paddingLeft:'0px'},1500);
-                    $projectHolder.prepend($newProject);                       
+                    $projectHolder.prepend($newProject);
                 },
                 open : function() {
                     $("html,body").stop();
@@ -748,19 +771,26 @@
                 return Portfolio.CONFIG.site_root + friendly_album + friendly_gallery;
             },
             pushUrl: function(pushIt) {                                  
-                var setURL;
+                var setURL;                
                 if(pushIt == null || pushIt == undefined) {
                     setURL = Portfolio.route.createUrl();                   
                 } else {
                    setURL = Portfolio.CONFIG.site_root + pushIt;
                 }
+                var setTitle = "LOREN GRIXTI Portfolio : "+Portfolio.CONFIG.active_gallery_slug;                
+
                 //Point of entry : all events point to this
-                Portfolio.GLOBAL.History.pushState(null, null, '/'+ setURL);                                      
+                Portfolio.GLOBAL.History.pushState(setTitle,"", '/'+ setURL); 
+
+                //PUSH PAGE TO GOOGLE ANALYTICS
+                if (_gaq) _gaq.push(['_trackEvent', "PORTFOLIO", "page",Portfolio.CONFIG.active_gallery_slug]);
             },
             go: function() {     
                 //Function that handles url changes
                 url = window.location.href;
                 var getSlugs = url.substr((Portfolio.CONFIG.site_domain+Portfolio.CONFIG.site_root).length,url.length);
+                getSlugs = getSlugs.replace("#./","");
+                
                 var slugs = getSlugs.split('/');                    
                 console.log("GOING TO : "+getSlugs);
                 
