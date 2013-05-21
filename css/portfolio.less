@@ -160,7 +160,7 @@ body {
 
 	@media (min-width : 381px) {
 		overflow-x: hidden;
-		overflow-y: visible;	
+		overflow-y: auto;	
 	}
 	/*SITE LAUNCH INTERFACE ANIMATION*/
 	&.intro aside nav {
@@ -174,6 +174,46 @@ body {
 		.transition(all,1s);	
 		.delay(4s);
 	}
+	/*STATES*/
+	&.loading {
+		#super-container aside , #super-container #layouts  {
+			display: none;
+		}
+	}
+	&.galleries-open {
+		#super-container #galleries-container #galleries {
+			display: block;
+		}	
+	} 
+	&.project-open {
+		#super-container #project-container {
+			display: block;
+		}
+		#super-container #galleries-container #galleries {
+			display: none;
+		}	
+		#super-container .blackScreen {
+			display: block;
+		}
+	} 
+	&.showreel-open {
+		#super-container #showreel,
+		#super-container #showreel-container {
+			display: block;
+		}
+		#super-container .blackScreen {
+			display: block;
+		}
+	}
+	&.about-open {
+		#super-container #about,
+		#super-container #about-container {
+			display: block;
+		}
+		#super-container .blackScreen {
+			display: block;
+		}
+	}	
 }
 #super-container {
 	width: 100%;
@@ -184,11 +224,12 @@ body {
 	&.enable {
 		left: 0;
 	}
-	&.state-loading {
-		aside , #layouts {
-			display: none;
-		}
+
+	#about-container,
+	#showreel-container {
+		display: none;
 	}
+
 }
 .gitIcon {
 	width: 27px;
@@ -262,7 +303,6 @@ body {
 	background-image: @sprite;
 	background-position: 29px -504px;
 	background-repeat: no-repeat;
-
 }
 
 header  {
@@ -297,16 +337,12 @@ aside {
 			}
 		}
 	}
-	
-
 	font-size: 32px;
 	/*background-image: @dotted;*/
 	background-repeat:  repeat;
 	.lightFont;
 	color: #a5a5a5;
 	line-height: 24px;
-
-
 	position: fixed;
 	top: 	0;
 	left: 	0px;
@@ -317,7 +353,6 @@ aside {
 	nav {
 		position: relative;
 		left: -@asideWidth;
-
 		&.enabled {
 			left: 0;
 		}
@@ -794,11 +829,8 @@ aside {
 	}
 }
 #super-container>#about-container {
-	display: none;
-	
+	display: none;	
 	position: fixed;
-	
-
 	#about {
 		.closer {
 			.closerButton;
@@ -866,14 +898,11 @@ aside {
 			a.contact , span.tel {
 				border-bottom: 1px dashed #bec3c7;
 			}		
-
 			a.social, a.contact {	
 				&:hover {
 					outline:1px dashed #979b9f;	
 				}
-				&.social {						
-					
-					
+				&.social {										
 					span {
 						width: 115px;
 						height:44px;
@@ -910,7 +939,6 @@ aside {
 
 
 /*********** TABLET MODE *********************/
-
 @media (max-width : @maxTabletMode)  {
 	#super-container  {
 		header  {
@@ -959,7 +987,7 @@ aside {
 }
 @media (max-width : 1000px)  {
 	body {
-		overflow: visible !important;
+		overflow: auto;
 	}
 	#project-container  {
 			max-width: 725px;
@@ -980,8 +1008,7 @@ aside {
 /*********** SMALL TABLET MODE *********************/
 @media (max-width : 790px) {
 	#super-container {	
-		#project-container {
-		
+		#project-container {		
 				.nav.left , .nav.right {
 					display: none;
 				}
@@ -993,53 +1020,226 @@ aside {
 @media (max-width : 380px) {
 	body , html {		
 		-webkit-overflow-scrolling: touch;		
+		height: 100%;
+		overflow-x: hidden;
 	}	
 	div, p, span , a {
-		position: static !important;
-		float: none !important;
+		position: static !important;		
 	}
 	.goTop  {
 		display: none;
 	}
-	#super-container  {
-
-		header {
-			#nav-toggler {
+	body>#preloader {
+		position: absolute !important;
+		top : 97px;
+	}
+	body {
+		&.project-open {
+			#super-container aside, #super-container header#responsive {
+				display: none;
+			}
+		}
+		&.loading {
+			#super-container header#responsive #nav-toggler {
+				display: none;
+			}
+		}
+		&.mobileNav-open {
+			overflow: hidden;
+			#super-container aside {
 				display: block;
+			}
+			#super-container header#responsive,
+			#super-container #galleries-container
+			 {
+				display: none;
+			} 
+		}
+		&.showreel-open {
+			#super-container {
+				.blackScreen {
+					display: none;
+				}
+				header#responsive,
+				#galleries-container
+				{
+					display: none;
+				}
+				#showreel {
+					position: absolute;
+					width: 100%;
+					height: 100%;
+				}
+
+			}
+		}
+		&.about-open {
+			#super-container {
+				.blackScreen {
+					display: none;
+				}
+				header#responsive,
+				#galleries-container
+				{
+					display: none;
+				} 
+				#about-container {
+					display: block !important;
+					position: static;
+					#about 	{			
+						position: static;
+						overflow: visible;
+						height: auto;
+						.closer {
+							background-position: 0 -115px;
+							height: 73px;
+						}
+						.photo {
+							display: none;
+						}
+						&, .profile, .profile p  {
+							width: 100%;
+						}
+						.profile {
+							display: block;
+
+							&, p {
+								height: auto;
+							}
+							&>p span {
+								margin: 0;
+	    						padding: 25px;
+							}
+							&>a {
+								display: block;
+								width: 100%;
+							}
+							&>p span em {
+								font-size: 22px;
+								 padding: 23px 0;
+							}
+						}
+					}
+				}
+			}	
+		}
+	}
+	#super-container  {		
+		header#responsive {
+			#nav-toggler {				
+				display: block;
+				width: 100%;
+				height: 50px;
+				line-height: 50px;
+				margin: 20px 0;
+				font-family: 'Custom-Reg';
+    			font-size: 12px;
+				display: inline-block;
+				color: #FFF;
+				text-decoration: none;
+				text-indent: 25px;
+				background-color: green;
+	
+				i:before {					
+    				content: "≡";
+    				font-family: Arial;
+    				font-size: 25px;
+    				font-weight: 100;
+					display: block;
+					height: 50px;
+					width: 64px;					
+					text-align: center;
+					float: right;				
+					color: white;
+					text-decoration: none;
+					text-indent: 0;
+				}
+
 			}
 			.mainTitle {
 				background-position: -5px -532px;
+				float: none;
+				height: 90px;
 			}
-		}
-	
+		}	
 		aside {
 			display: none;
+			position: static;
+			nav {
+				position: absolute;
+				top:0;
+				width: 100%;
+				height: 100%;
+				margin-top: 0 !important;
+
+				&>a {
+					height: 25%;
+					float: none;
+					border: none;
+
+					&:after {
+						margin-top:-50px;
+						float: none;
+						right: 0;
+						position: absolute;
+						margin-right: 2px;
+						border: 0;
+					}
+					&:before {
+						display: none;
+					}
+					&>span {
+						visibility: visible;
+						opacity: 1;
+						float: none;
+						margin:0;
+						padding: 0;
+						width: 100%;
+						height: 100%;
+						display: block;
+						text-indent: 0;
+						text-align: center;
+						font-family: 'Custom-Reg';
+    					font-size: 14px;
+						&:before {
+							content:"";							
+							display: block;
+							height: 50%;
+							margin-top: -27px;
+						}
+					}
+
+				}
+			}
 		}
-	
-		#project-container {
 			
+		#project-container {			
 			.project {
+				.header {
+					float: right;
+					.closer {
+						height: 75px;
+						background-position: 0 -118px;
+					}
+				}
 				h2 {
-					margin-top: 25px;
-					margin-left: 20px;
+					padding-top: 25px;
+					margin: 0 0 0 20px;
 					font-size: 20px;
 					width: auto;
 				}
 				.gallery-description {
 					width: auto;
-					margin: 0 20px;
+					margin: 0 20px 20px 20px;
 				}
 			}
 		}
 		#galleries-container {
-
 			#galleries {
 				height: auto;
 				overflow: visible;
-			}
-			
-			left: 0;			
-			
+			}			
+			left: 0;					
 			.element {
 				display: none;
 				&.active {
@@ -1065,8 +1265,7 @@ aside {
 					}
 					&>p {
 						display: none;
-					}
-			
+					}			
 				}
 			}
 
