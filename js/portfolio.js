@@ -15,15 +15,17 @@
                 Portfolio.getData.galleries(); // create array
                 Portfolio.template.start();    
                 Portfolio.navigation.gallery.preload(0,function(){ //Preload the gallery images before building interface                    
+                    Portfolio.template.resize.albums(); // page centering functions   
+                    Portfolio.navigation.start(); //elements that can be loaded after preloading
                     if(typeof callback == 'function'){
                         callback.call(this);//this callback waits for ajax loading
                     }
-                });           
+                });                 
             });
         },
         start : function() {
             Portfolio.route.init();            
-            Portfolio.navigation.init();
+            Portfolio.navigation.init();           
         },
         support : function() {
             //Browser support conditions            
@@ -58,7 +60,7 @@
         //Central configuration variables for app
         CONFIG : {
             //URL CONF
-             "site_domain"           : "http://"+window.top.location.hostname, //IPHONE is giving problems with this 
+             "site_domain"           : "http://"+window.top.location.hostname,
             //"site_domain"           : "http://lorengrixti.com",               
             "site_root"             : "/",
 
@@ -109,7 +111,7 @@
             },
             albums : function() {  //getData
                 $albums = Portfolio.DATASOURCES.albums;
-                Portfolio.navigation.album.create($albums);             
+                Portfolio.navigation.album.create($albums);                           
             },      
             galleries : function() {  //getData
                 $galleries = Portfolio.DATASOURCES.galleries;
@@ -171,38 +173,44 @@
             }
         },  
         navigation : {
-            init: function() {
-
-                Portfolio.navigation.gallery.create(); // create dom elements            
+            start : function() {
                 Portfolio.navigation.album.show(); 
-
                 //Set initial events
                 if(!Portfolio.CONFIG.isDirectAccess) {
                     $("body").addClass("intro");
                 } else {
                     $("body").removeClass("intro");
                 }
-                Portfolio.UI.root.addClass("enable");               
-                
-                $(document).keyup(function(e) {
-                  if (e.keyCode == 27) { Portfolio.navigation.home(); }   // esc
-                });
+                Portfolio.UI.root.addClass("enable");  
+                Portfolio.navigation.setScrollTop();       
+            },
+            setScrollTop : function() {
                 $(window).scroll(function() {
                     if($(this).scrollTop()==0) {
                          $(".goTop").removeClass("enable");                  
                     } else {
                         $(".goTop").addClass("enable");                 
                     }
-                }); 
-               	Portfolio.UI.nav.find("#about").click( function(e) {
-                    e.preventDefault();
-                    Portfolio.route.pushUrl("about");
-                    Portfolio.navigation.changeState(false,"mobileNav-open");
                 });
                 $(".goTop").click(function(e) {
                     e.preventDefault();
                     Portfolio.template.resize.scrollTop();
                 });
+            },
+            init: function() {
+
+                Portfolio.navigation.gallery.create(); // create dom elements   
+                
+                $(document).keyup(function(e) {
+                  if (e.keyCode == 27) { Portfolio.navigation.home(); }   // esc
+                });
+
+               	Portfolio.UI.nav.find("#about").click( function(e) {
+                    e.preventDefault();
+                    Portfolio.route.pushUrl("about");
+                    Portfolio.navigation.changeState(false,"mobileNav-open");
+                });
+                
                 //Launch galleries using default filtering
                 Portfolio.template.about.init();
                 Portfolio.navigation.album.launch();
@@ -244,16 +252,17 @@
                         $nav_el = "<a class='album-links "+addClass+"' href='#' data-slug="+getSlug+" id="+getID+"><span>"+getName+"</span></a>";               
                         $html += $nav_el;
                     });
-                    Portfolio.UI.nav.prepend($html);
+                    Portfolio.UI.nav.prepend($html);                         
+                   
                     Portfolio.UI.nav.find(".album-links").click( function(e){
                         e.preventDefault();
                         var setSlug = $(this).data("slug");
                         Portfolio.navigation.album.setActive(setSlug);
                         Portfolio.navigation.album.launch(setSlug);
                         Portfolio.navigation.changeState(false,"mobileNav-open");
-                    });
+                    });                    
                 },
-                show : function() {
+                show : function() {                    
                     Portfolio.UI.nav.addClass("enabled");
                 },
                 activate : function(slug) { //visual activation
@@ -484,16 +493,15 @@
                 $(window).resize(function() {
                     clearTimeout(Portfolio.CONFIG.resize_timer);
                     Portfolio.CONFIG.resize_timer = setTimeout(Portfolio.template.resize.init, 100);
-                });
-                Portfolio.template.resize.albums(); // page centering functions                
+                });                               
                 Portfolio.template.project.init();
             },            
             resize : { //template
                 init : function() {
                     Portfolio.template.resize.albums();
                 },
-                albums: function() {
-                    Portfolio.UI.nav.css("margin-top",Portfolio.UI.navContainer.height()/2-Portfolio.UI.nav.height()/2);
+                albums: function() {                    
+                    Portfolio.UI.nav.css("margin-top",$(window).height()/2-Portfolio.UI.nav.height()/2);
                 },
                 scrollTop: function(mode) {             
                     console.log("resize function");
