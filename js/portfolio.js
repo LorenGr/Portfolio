@@ -469,6 +469,12 @@
                         if      (e.keyCode == 39) { Portfolio.UI.projects.children(":first").find(".side a.active").next().trigger("click"); }   // left
                         else if (e.keyCode == 37) { Portfolio.UI.projects.children(":first").find(".side a.active").prev().trigger("click"); }   // right
                     });
+                    Portfolio.UI.projects.swipe({
+                      swipe:function(event, direction, distance, duration, fingerCount) {
+                        if      (direction == "left")  { Portfolio.UI.projects.children(":first").find(".side a.active").next().trigger("click"); }   // left
+                        else if (direction == "right") { Portfolio.UI.projects.children(":first").find(".side a.active").prev().trigger("click"); }   // right
+                      }
+                    });
                     
             	},
                 isSlideForward : function()  {
@@ -910,8 +916,7 @@
                 });
             }
         } else {
-            thisChild = obj.find(target).children(":last");	
-           
+            thisChild = obj.find(target).children(":last");	           
             if(getFrom == "left" || getFrom == "right") {           
                 if(getFrom=="left") {
                     calcLeft = -calcLeft;
