@@ -27,12 +27,13 @@ html { -webkit-font-smoothing: antialiased; }
 .ui-border {
 	border: @ui-border;
 }
-.transition(@property,@duration) {
-	-webkit-transition: @property @duration cubic-bezier(0.230, 1.000, 0.320, 1.000);
-	-moz-transition: @property @duration cubic-bezier(0.230, 1.000, 0.320, 1.000);
-	-o-transition: @property @duration cubic-bezier(0.230, 1.000, 0.320, 1.000);
-	transition: @property @duration cubic-bezier(0.230, 1.000, 0.320, 1.000);
+.transition(@property,@duration,@ease:cubic-bezier(0.230, 1.000, 0.320, 1.000)) {
+	-webkit-transition: @property @duration @ease;
+	-moz-transition: @property @duration @ease;
+	-o-transition: @property @duration @ease;
+	transition: @property @duration @ease;
 }
+
 .scale (@factor) {
 	-webkit-transform: scale(@factor);
 	-moz-transform: 	 scale(@factor);
@@ -130,6 +131,8 @@ html { -webkit-font-smoothing: antialiased; }
 }
 					
  /************  Z-INDEXES **************/
+#project-container #projects,
+#project-container .project		{ z-index: 650; }
 .goTop							{ z-index: 620; }
 #showreel, 
 #about-container				{ z-index: 600; }
@@ -137,6 +140,7 @@ html { -webkit-font-smoothing: antialiased; }
 #project-container .right		{ z-index: 550; }
 #project-container .closer		{ z-index: 460; }
 #project-container .side		{ z-index: 450; }
+#project-container .header 		{ z-index: 445; }
 #project-container .body 		{ z-index: 440; }
 .blackScreen,
 .preloader						{ z-index: 430; }
@@ -607,7 +611,6 @@ aside {
 						background-size: 47px 47px;
 					}									
 				}
-
 				.box-sizing;				
 				width: @posterWidth;
 				height: @elementHeight;	
@@ -618,8 +621,6 @@ aside {
 				background-position:0 72px;
 
 				&>div {
-					
-					
 					height: 72px;						
 					overflow: hidden;
 
@@ -661,19 +662,16 @@ aside {
 		}
 	}
 	&.blogMode  {
-
 		@media (min-width :@minTabletMode)  {
 			.blog-mode;	
 		}
 		@media (max-width : @maxTabletMode)  {
 			.tile-mode;	
-		}
-		
+		}		
 	}
 	&.tileMode  {
 		.tile-mode;
-	}	
-	
+	}		
 }
 #project-container {
 	display: none;
@@ -687,6 +685,18 @@ aside {
 	width: 100%;
 	max-width: 960px;
 	margin: 30px auto 0 auto; 
+
+	#projects {
+		-webkit-perspective: 600px;		
+		perspective: 600px;
+		position: relative;
+		top: 0;
+		left: 0; 	
+		right: 0;
+		width: 100%;
+		height: 100%;
+	}
+	
 
 	.left , .right {
 		display: block;
@@ -721,8 +731,16 @@ aside {
 
 	.project {		
 		display: none;
-		position: relative;		
+		position: relative;
+
+		&.exiting {
+			.header .side a {
+				border-bottom: 1px solid #3f3f3f;
+			}
+		}
 		.header {
+			position: absolute;
+			width: 100%;		
 			.closer {
 				.closerButton;
 				margin-top: 0px;	
@@ -767,8 +785,7 @@ aside {
 		}
 		.body {
 			h2 {				
-				margin-top: 47px;
-		
+				margin-top: 47px;		
 				font-size: 31px;
 				line-height: 40px;
 				.box-sizing;
@@ -853,7 +870,7 @@ aside {
 			.box-sizing;
 			height: 600px;
 			vertical-align: top;
-			background-image: url("../img/loren.png");
+			background-image: url("../img/about.jpg");
 			background-repeat: no-repeat;
 		}
 		.profile {
@@ -874,8 +891,8 @@ aside {
 					display: block;
 					margin: 0 93px;
 					em {
-						font-family: 'Custom-Reg';
-						font-size: 32px;
+						font-family: 'Custom-Light';
+						font-size: 31px;
 						display: block;
 						padding: 44px 0;		
 					}
@@ -1116,8 +1133,11 @@ aside {
 		height: 100%;
 		overflow-x: hidden;
 	}	
-	div, p, span , a {
-		position: static !important;		
+	header#responsive , aside , #galleries-container {		
+		position: static !important;	
+		div, p, span , a {
+			position: static !important;		
+		}
 	}
 	.goTop  {
 		display: none;
@@ -1144,7 +1164,7 @@ aside {
 				#about-container {					
 					#about 	{							
 						.profile {							
-							&>a {
+							&>a , &>.tel {
 								display: block;
 								width: 100%;
 							}							

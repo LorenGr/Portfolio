@@ -572,21 +572,15 @@
                         $projectSide = $newProject.find(".side"),
                         getSlug = slug;
                     
-                    $newProject.attr("id","");
-                    
+                    $newProject.attr("id","");                    
                     $.each($projectSide.find("a"), function(i,v) {                        
                         if( $(this).data("album") !=  Portfolio.CONFIG.active_album_slug ) {                            
                             $(this).remove();                            
                         }
                     });     
-                    
-                    //$projectSide.find("a").not("[data-album='"+Portfolio.CONFIG.active_album_slug+"']").remove();
-                    
                     $projectTitle.html(Portfolio.CONFIG.active_gallery_title);
-                    //Retrieve main desctription of gallery and add it under first image         
-                    
-                    $projectDescription.html(Portfolio.navigation.gallery.getActive().find("p").text());
-                    
+                    //Retrieve main desctription of gallery and add it under first image   
+                    $projectDescription.html(Portfolio.navigation.gallery.getActive().find("p").text());                    
                     $filePath = Portfolio.CONFIG.site_domain + Portfolio.CONFIG.site_root + Portfolio.CONFIG.gallery_images_path;
                     
                     $.each($pictures, function(i,v) {                   
@@ -609,8 +603,7 @@
                     }); 
                     $projectSide.find("a#"+Portfolio.CONFIG.active_gallery).addClass("active");
                     $projectBody.append($html);
-                    $projectBody.css("background-image","url("+$filePath+getSlug+ "/bg.jpg)");
-                    $projectBody.parent().css("padding-left","50px").animate({paddingLeft:'0px'},1500);
+                    $projectBody.css("background-image","url("+$filePath+getSlug+ "/bg.jpg)");                    
                     $projectHolder.prepend($newProject);
                 },
                 open : function() {
@@ -867,11 +860,14 @@
     };  
     $.fn.slide = function(state,from,target,mode,callback) { //this slides in elements from any corner of the screen
         
-        var calcLeft = this.width()+(($(window).width()-this.width())/2),
+        var calcLeft = this.width()/2,            
+            calcZ = -this.width()/2,
             calcTop  = this.height()+(($(window).height()-this.height())/2),
             getFrom  = from || "left",
             getState  = state || "in",
             obj = this,
+            calcY = 90,
+            animationSpeed = 1.5,            
             thisChild;
 
         if(getState == "in") {      
@@ -880,13 +876,27 @@
             if(getFrom == "left" || getFrom == "right") {           
                 if(getFrom=="left") {
                     calcLeft = -calcLeft;
+                    calcY = -calcY;
                 }
-                Portfolio.CONFIG.isInMotion = true;
-                thisChild.css("left",calcLeft).show().animate({
-                    left : 0
-                },800,"easeInOutExpo",function() {
-                    Portfolio.CONFIG.isInMotion = false;
-                });
+                Portfolio.CONFIG.isInMotion = true;                
+                thisChild.css("left",calcLeft).show();
+                thisChild.show();                
+                TweenMax.to(thisChild, 0, { rotationY:calcY,z:calcZ,immediateRender:true });  
+                thisChild.find(".body").css("backgroundColor","#000000");
+                thisChild.find(".header,.body .gallery-description,.body .content").css("opacity:0");
+
+                TweenMax.to(thisChild, animationSpeed, {
+                    left:0,                    
+                    rotationY:0,
+                    z:0,                                   
+                    ease:Expo.easeInOut,                    
+                    onComplete:function() {
+                         Portfolio.CONFIG.isInMotion = false;
+                    }
+                }); 
+                TweenMax.to(thisChild, 0, {zIndex:900,delay:animationSpeed/2});
+                TweenMax.to(thisChild.find(".body"), animationSpeed, {backgroundColor:"#FFFFFF"});                 
+                TweenMax.to(thisChild.find(".header,.body .gallery-description,.body .content"), animationSpeed, {autoAlpha:1});
             }
             if(getFrom == "top" || getFrom == "bottom") {           
                 if(getFrom == "top") {
@@ -901,34 +911,41 @@
             }
         } else {
             thisChild = obj.find(target).children(":last");	
+           
             if(getFrom == "left" || getFrom == "right") {           
                 if(getFrom=="left") {
                     calcLeft = -calcLeft;
+                    calcY = -calcY;
                 }
-                Portfolio.CONFIG.isInMotion = true;
-                thisChild.css("left",0).animate({
-                    left : calcLeft
-                },500,"easeInOutExpo",function() {
-                    
-                    if(mode == "slide") {
-                    	thisChild.remove();	
-                    }
-                    
-                    Portfolio.CONFIG.isInMotion = false;
-                    if(typeof callback == 'function'){
-                        callback.call(this);
+                Portfolio.CONFIG.isInMotion = true;                
+                thisChild.addClass("exiting");
+                TweenMax.to(thisChild, animationSpeed, {
+                    left:calcLeft,                    
+                    rotationY:calcY,                
+                    ease:Expo.easeInOut,
+                    z: calcZ,                                                          
+                    onComplete:function() {
+                        if(mode == "slide") {
+                           thisChild.remove(); 
+                        }                        
+                        Portfolio.CONFIG.isInMotion = false;
+                        if(typeof callback == 'function'){
+                            callback.call(this);
+                        }
                     }
                 });
+                TweenMax.to(thisChild, 0, {zIndex:600,delay:animationSpeed/2}); 
+                TweenMax.to(thisChild.find(".body"), animationSpeed, {backgroundColor:"#000000"});                 
+                TweenMax.to(thisChild.find(".header,.body .gallery-description,.body .content"), animationSpeed, {autoAlpha:0.1});                
             }
-            if(getFrom == "top" || getFrom == "bottom") {           
-                
+            if(getFrom == "top" || getFrom == "bottom") {   
                 if(getFrom=="bottom") {
                     calcTop = calcTop;
                 }
                 Portfolio.CONFIG.isInMotion = true;
                 thisChild.css("top",0).animate({
                     top : calcTop
-                },500,"easeInOutExpo",function() {                    
+                },800,"easeInOutExpo",function() {                    
                     if(mode == "slide") {
                     	thisChild.remove();	
                     }                   
