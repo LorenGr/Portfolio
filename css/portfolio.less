@@ -132,6 +132,8 @@ html { -webkit-font-smoothing: antialiased; }
 }
 					
  /************  Z-INDEXES **************/
+
+.tooltip 						{ z-index: 700; }
 #project-container #projects,
 #project-container .project		{ z-index: 650; }
 .goTop							{ z-index: 620; }
@@ -685,7 +687,18 @@ aside {
 	background-color: @bg;
 	width: 100%;
 	max-width: 960px;
-	margin: 30px auto 0 auto; 
+	margin: 30px auto 0 auto;
+
+	.tooltip {
+		width: 244px;
+		height: 170px;
+		position: absolute;
+		right: 0px;
+		top: 0px;		
+		cursor: pointer;
+		background-image: @sprite;
+		background-position: 0 -640px;
+	} 
 
 	#projects {
 		-webkit-perspective: 600px;		

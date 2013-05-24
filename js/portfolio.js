@@ -84,7 +84,8 @@
             "playerLoaded"          : false,
             "isInMotion"            : false,
             "isDirectAccess"        : false,
-            "isMobile"              : false
+            "isMobile"              : false,
+            "isTooltipSeen"         : false
         },
         GLOBAL : {
             "History"           : window.History
@@ -454,6 +455,9 @@
                             } 
                         } 
                     });
+                    Portfolio.UI.projectContainer.find(".tooltip").click(function(){
+                        $(this).remove();
+                    });
 
                     Portfolio.UI.projectTemplate.find(".closer").click(function(e) {
                         e.preventDefault();
@@ -618,13 +622,13 @@
                     $projectHolder.prepend($newProject);
                 },
                 open : function() {
-                    //$("html,body").stop();                   
                     //call openpopin
                     var inDirection,outDirection;
                     if(Portfolio.navigation.project.isSlideForward())  {
                         inDirection = "right";outDirection = "left";
                     } else  {
-                        inDirection = "left";outDirection = "right";                    }
+                        inDirection = "left";outDirection = "right";                    
+                    }
                     Portfolio.UI.projectContainer.slide("in",inDirection,"#projects","slide");                    
                     Portfolio.template.resize.scrollTop("static");                    
                     Portfolio.CONFIG.open_popin = "project"; 
@@ -886,8 +890,7 @@
             if(getFrom == "left" || getFrom == "right") {           
                 if(getFrom=="left")calcY = -calcY;                              
                 Portfolio.CONFIG.isInMotion = true;                
-                thisChild.show();
-                
+                thisChild.show();                
                 TweenMax.to(thisChild, 0, { rotationY:calcY });  
                 thisChild.find(".body").css("backgroundColor","#000000");
                 thisChild.find(".header,.body .gallery-description,.body .content").css("opacity:0");
