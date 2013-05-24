@@ -695,6 +695,8 @@ aside {
 		right: 0;
 		width: 100%;
 		height: 100%;
+		-webkit-transform-style: preserve-3d;
+		transform-style: preserve-3d;
 	}
 	
 
@@ -732,12 +734,12 @@ aside {
 	.project {		
 		display: none;
 		position: relative;
-
-		&.exiting {
-			.header .side a {
-				border-bottom: 1px solid #3f3f3f;
-			}
-		}
+		
+		-webkit-backface-visibility:hidden; /* Chrome and Safari */
+		-moz-backface-visibility:hidden; /* Firefox */
+		-ms-backface-visibility:hidden; /* Internet Explorer */	
+		backface-visibility:hidden;
+		
 		.header {
 			position: absolute;
 			width: 100%;		
@@ -798,6 +800,7 @@ aside {
 			}
 			top: 0px;
 			width: 100%;
+			min-height:644px;
 			position: absolute;
 			background-color: white;
 			.gallery-description {
@@ -808,6 +811,7 @@ aside {
 			.content {			
 				padding:50px 50px 50px 100px; 
 				width: 600px;
+				min-height: 452px;
 				.description {
 					.paragraphText;					
 					margin: 39px 0;					

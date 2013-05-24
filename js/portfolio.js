@@ -228,7 +228,8 @@
                 console.log("going home");
                 Portfolio.CONFIG.recent_gallery = Portfolio.CONFIG.active_gallery;
                 Portfolio.CONFIG.active_gallery = "";
-                Portfolio.route.pushUrl();  
+                Portfolio.route.pushUrl();               
+                Portfolio.CONFIG.isInMotion = false;  
             },            
             album : { //navigation
                 create : function(getAlbums) {
@@ -396,11 +397,12 @@
                         callback.call(this);
                     }
                 },
-                launch : function(slug) {
+                launch : function(slug) {                            
                     if(slug != "2012") {                        
                         getPictures = Portfolio.getData.pictures(Portfolio.getData.getGalleryData("id",slug));
                         Portfolio.template.project.create(getPictures,slug);                        
-                        Portfolio.template.project.open();                                          
+                        Portfolio.template.project.open(); 
+
                     } else {
                         Portfolio.template.showreel.create();
                     }
@@ -431,24 +433,26 @@
             },
             project : { //navigation
             	init : function() {
-            		Portfolio.UI.projectTemplate.find(".side a").click(function(e) {                        
-                        console.log("clicked side");
-                        e.preventDefault();
-                        Portfolio.CONFIG.active_album_title = $(this).data("album");    
-                        Portfolio.navigation.gallery.setActive($(this).data("slug"));
-                        Portfolio.route.pushUrl();
+            		Portfolio.UI.projectTemplate.find(".side a").click(function(e) {  //1 single point of entry for in-project navigation                      
+                        if(!Portfolio.CONFIG.isInMotion) {
+                            console.log("clicked side");
+                            e.preventDefault();
+                            Portfolio.CONFIG.active_album_title = $(this).data("album");    
+                            Portfolio.navigation.gallery.setActive($(this).data("slug"));
+                            Portfolio.route.pushUrl();
 
-                        //show or hide left/right depending on extremities
-                        if($(this).index()==1) {
-                            Portfolio.UI.projectContainer.find(".left.nav").hide();
-                        } else {
-                            Portfolio.UI.projectContainer.find(".left.nav").show();
-                        }                        
-                        if($(this).is(':last-child')) {
-                            Portfolio.UI.projectContainer.find(".right.nav").hide();
-                        } else {
-                            Portfolio.UI.projectContainer.find(".right.nav").show();
-                        }                     
+                            //show or hide left/right depending on extremities
+                            if($(this).index()==1) {
+                                Portfolio.UI.projectContainer.find(".left.nav").hide();
+                            } else {
+                                Portfolio.UI.projectContainer.find(".left.nav").show();
+                            }                        
+                            if($(this).is(':last-child')) {
+                                Portfolio.UI.projectContainer.find(".right.nav").hide();
+                            } else {
+                                Portfolio.UI.projectContainer.find(".right.nav").show();
+                            } 
+                        } 
                     });
 
                     Portfolio.UI.projectTemplate.find(".closer").click(function(e) {
@@ -577,6 +581,7 @@
                         $projectBody   = $newProject.find(".content"),
                         $projectSide = $newProject.find(".side"),
                         getSlug = slug;
+                       
                     
                     $newProject.attr("id","");                    
                     $.each($projectSide.find("a"), function(i,v) {                        
@@ -595,13 +600,13 @@
                         $getDescription     = $pictures[i].description;
                         $getWidth           = $pictures[i].metaWidth;
                         $getHeight          = $pictures[i].metaHeight;
-                        $getPrevID          = $pictures[i].previewpic;
+                        $getPrevID          = $pictures[i].previewpic;                                               
 
                         if($getID!=$getPrevID) {
                               $pic_el = "<img src='"  + $filePath+getSlug+ "/"+$getSource
                                     +"' width="+$getWidth
                                     +"  height="+$getHeight
-                                    +" class='projectImage' "
+                                    +" class='projectImage' style='display:none;'"
                                     +"  id='"+$getID+"'>" 
                                     + "<div class='description'>"+$getDescription+"</div>";
                             $html += $pic_el;
@@ -613,7 +618,7 @@
                     $projectHolder.prepend($newProject);
                 },
                 open : function() {
-                    $("html,body").stop();
+                    //$("html,body").stop();                   
                     //call openpopin
                     var inDirection,outDirection;
                     if(Portfolio.navigation.project.isSlideForward())  {
@@ -633,10 +638,9 @@
                     //call closepopin
                     Portfolio.navigation.changeState(false,"project-open");
                     Portfolio.template.resize.scrollTop("static");
-                    Portfolio.UI.projectContainer.slide("out","left","#projects","slide", function()  {                        
-                        var obj = Portfolio.navigation.gallery.getRecent();
-                        if(obj!="") Portfolio.template.resize.scrollTop(obj.offset().top-obj.height()/2);                                           
-                    });                    
+                    Portfolio.UI.projects.empty();                  
+                    var obj = Portfolio.navigation.gallery.getRecent();
+                    if(obj!="") Portfolio.template.resize.scrollTop(obj.offset().top-obj.height()/2); 
                 }
             },
             closepopin : function() {
@@ -835,21 +839,21 @@
                         break; 
                     default : //PROJECT ACCESS
                         if(Portfolio.CONFIG.first_time) { //If accessing a project directly through url                            
+                            
                             //if page requested is a gallery                
                             Portfolio.CONFIG.isDirectAccess = true;
-                            Portfolio.init( function() {                                
-                               
+                            Portfolio.init( function() {
                                 Portfolio.navigation.album.setActive(slugs[0]); 
                                 Portfolio.navigation.gallery.setActive(slugs[1]);                               
                                 Portfolio.navigation.gallery.launch(slugs[1]); //Launch project                                           
                             });
-                        } else {                                        	
+                        } else {
                             if(!Portfolio.CONFIG.isInMotion) {
                                 Portfolio.navigation.album.setActive(slugs[0]);                             
                                 if( Portfolio.CONFIG.active_gallery_slug != slugs[1] ) {
                                 	Portfolio.navigation.gallery.setActive(slugs[1]);	
-                                }
-                                Portfolio.navigation.gallery.launch(slugs[1]); //Launch project 
+                                }                                 
+                                Portfolio.navigation.gallery.launch(slugs[1]); //Launch project
                             }
                         }
                         console.log("executed case: default");                          
@@ -873,35 +877,33 @@
             getState  = state || "in",
             obj = this,
             calcY = 90,
-            animationSpeed = 1.5,            
-            thisChild;
-
+            animationSpeed = 2,            
+            thisChild;            
+        
         if(getState == "in") {      
-            thisChild = obj.find(target).children(":first");	           
+            thisChild = obj.find(target).children(":first");           	           
 
             if(getFrom == "left" || getFrom == "right") {           
-                if(getFrom=="left") {
-                    calcLeft = -calcLeft;
-                    calcY = -calcY;
-                }
+                if(getFrom=="left")calcY = -calcY;                              
                 Portfolio.CONFIG.isInMotion = true;                
-                thisChild.css("left",calcLeft).show();
-                thisChild.show();                
-                TweenMax.to(thisChild, 0, { rotationY:calcY,z:calcZ,immediateRender:true });  
+                thisChild.show();
+                
+                TweenMax.to(thisChild, 0, { rotationY:calcY });  
                 thisChild.find(".body").css("backgroundColor","#000000");
                 thisChild.find(".header,.body .gallery-description,.body .content").css("opacity:0");
 
                 TweenMax.to(thisChild, animationSpeed, {
-                    left:0,                    
-                    rotationY:0,
-                    z:0,                                   
+                    delay:animationSpeed/2,                                       
+                    rotationY:0,                     
+                    transformOrigin:"50% 50% "+calcZ,                                                
                     ease:Expo.easeInOut,                    
-                    onComplete:function() {
-                         Portfolio.CONFIG.isInMotion = false;
+                    onComplete:function() {                         
+                        thisChild.find(".body .content img").fadeIn();
+                        Portfolio.CONFIG.isInMotion = false;
                     }
-                }); 
+                });
                 TweenMax.to(thisChild, 0, {zIndex:900,delay:animationSpeed/2});
-                TweenMax.to(thisChild.find(".body"), animationSpeed, {backgroundColor:"#FFFFFF"});                 
+                TweenMax.to(thisChild.find(".body"), animationSpeed*2, {backgroundColor:"#FFFFFF"});                 
                 TweenMax.to(thisChild.find(".header,.body .gallery-description,.body .content"), animationSpeed, {autoAlpha:1});
             }
             if(getFrom == "top" || getFrom == "bottom") {           
@@ -915,33 +917,37 @@
                     Portfolio.CONFIG.isInMotion = false;
                 });
             }
-        } else {
+        } else {  //out
             thisChild = obj.find(target).children(":last");	           
+           
             if(getFrom == "left" || getFrom == "right") {           
-                if(getFrom=="left") {
-                    calcLeft = -calcLeft;
-                    calcY = -calcY;
-                }
-                Portfolio.CONFIG.isInMotion = true;                
-                thisChild.addClass("exiting");
-                TweenMax.to(thisChild, animationSpeed, {
-                    left:calcLeft,                    
-                    rotationY:calcY,                
-                    ease:Expo.easeInOut,
-                    z: calcZ,                                                          
-                    onComplete:function() {
-                        if(mode == "slide") {
-                           thisChild.remove(); 
-                        }                        
-                        Portfolio.CONFIG.isInMotion = false;
-                        if(typeof callback == 'function'){
-                            callback.call(this);
-                        }
-                    }
-                });
-                TweenMax.to(thisChild, 0, {zIndex:600,delay:animationSpeed/2}); 
-                TweenMax.to(thisChild.find(".body"), animationSpeed, {backgroundColor:"#000000"});                 
-                TweenMax.to(thisChild.find(".header,.body .gallery-description,.body .content"), animationSpeed, {autoAlpha:0.1});                
+                if(getFrom=="left") calcY = -calcY;            
+                Portfolio.CONFIG.isInMotion = true;     
+                
+                thisChild.find(".body .content img:nth-child(n+2)").css("display","none");
+                
+                        TweenMax.to(thisChild.find(".header,.body h2,.body .content,.body .gallery-description"), animationSpeed/2, {
+                            autoAlpha:0,
+                            onComplete : function() {
+                                thisChild.find(".header,.body h2,.body .content,.body .gallery-description").remove();
+                                TweenMax.to(thisChild, animationSpeed, {                                                       
+                                    rotationY:calcY,                
+                                    ease:Expo.easeInOut,                                  
+                                    transformOrigin:"50% 50% "+calcZ,                                                                                  
+                                    onComplete:function() {
+                                        if(mode == "slide") {
+                                           thisChild.remove(); 
+                                        }                        
+                                        Portfolio.CONFIG.isInMotion = false;
+                                        if(typeof callback == 'function'){
+                                            callback.call(this);
+                                        }
+                                    }
+                                });
+                                TweenMax.to(thisChild, 0, {zIndex:600,delay:animationSpeed/2}); 
+                                TweenMax.to(thisChild.find(".body"), animationSpeed*2, {backgroundColor:"#000000"});  
+                            }
+                        });               
             }
             if(getFrom == "top" || getFrom == "bottom") {   
                 if(getFrom=="bottom") {
