@@ -893,12 +893,13 @@
                 thisChild.find(".header,.body .gallery-description,.body .content").css("opacity:0");
 
                 TweenMax.to(thisChild, animationSpeed, {
-                    delay:animationSpeed/2,                                       
+                    delay:animationSpeed/3,                                       
                     rotationY:0,                     
                     transformOrigin:"50% 50% "+calcZ,                                                
                     ease:Expo.easeInOut,                    
-                    onComplete:function() {                         
-                        thisChild.find(".body .content img").fadeIn();
+                    onComplete:function() {                                
+                        thisChild.find(".body .content img").css("opacity",0).show();
+                        TweenMax.to(thisChild.find(".body .content img"), 0.5, {autoAlpha:1});        
                         Portfolio.CONFIG.isInMotion = false;
                     }
                 });
@@ -926,7 +927,7 @@
                 
                 thisChild.find(".body .content img:nth-child(n+2)").css("display","none");
                 
-                        TweenMax.to(thisChild.find(".header,.body h2,.body .content,.body .gallery-description"), animationSpeed/2, {
+                        TweenMax.to(thisChild.find(".header,.body h2,.body .content,.body .gallery-description"), animationSpeed/3, {
                             autoAlpha:0,
                             onComplete : function() {
                                 thisChild.find(".header,.body h2,.body .content,.body .gallery-description").remove();
